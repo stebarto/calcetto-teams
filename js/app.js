@@ -161,7 +161,10 @@ function setupEventListeners() {
 }
 
 // Avvia app
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+    adminUI.init();
+});
 
 // Service Worker per PWA
 if ('serviceWorker' in navigator) {

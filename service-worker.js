@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calcetto-teams-v1';
+const CACHE_NAME = 'calcetto-teams-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -6,6 +6,7 @@ const urlsToCache = [
   '/js/app.js',
   '/js/supabase.js',
   '/js/generator.js',
+  '/js/admin.js',
   '/manifest.json'
 ];
 

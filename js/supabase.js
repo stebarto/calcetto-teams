@@ -11,11 +11,64 @@ class SupabaseClient {
             'Authorization': `Bearer ${this.key}`,
             'Content-Type': 'application/json'
         };
+        this.session = null;
+    }
+
+    // Auth methods
+    async signInWithOtp(email) {
+        const response = await fetch(`${this.url}/auth/v1/otp`, {
+            method: 'POST',
+            headers: this.headers,
+            body: JSON.stringify({
+                email,
+                options: {
+                    emailRedirectTo: window.location.origin
+                }
+            })
+        });
+        return response.json();
+    }
+
+    async getSession() {
+        const hash = window.location.hash;
+        if (hash && hash.includes('access_token')) {
+            const params = new URLSearchParams(hash.substring(1));
+            const accessToken = params.get('access_token');
+            const refreshToken = params.get('refresh_token');
+            
+            if (accessToken) {
+                this.session = { access_token: accessToken, refresh_token: refreshToken };
+                localStorage.setItem('supabase_session', JSON.stringify(this.session));
+                window.location.hash = '';
+                return this.session;
+            }
+        }
+        
+        const stored = localStorage.getItem('supabase_session');
+        if (stored) {
+            this.session = JSON.parse(stored);
+        }
+        return this.session;
+    }
+
+    async signOut() {
+        this.session = null;
+        localStorage.removeItem('supabase_session');
+    }
+
+    getAuthHeaders() {
+        if (this.session) {
+            return {
+                ...this.headers,
+                'Authorization': `Bearer ${this.session.access_token}`
+            };
+        }
+        return this.headers;
     }
 
     async getPlayers() {
         try {
-            const response = await fetch(`${this.url}/rest/v1/giocatori?attivo=eq.true&select=*`, {
+            const response = await fetch(`${this.url}/rest/v1/giocatori?attivo=eq.true&select=*&order=nome.asc`, {
                 headers: this.headers
             });
             
@@ -27,7 +80,72 @@ class SupabaseClient {
             return players.map(p => this.mapPlayer(p));
         } catch (error) {
             console.error('Errore Supabase:', error);
-            return this.getMockPlayers();
+            return [];
+        }
+    }
+
+    async addPlayer(player) {
+        const response = await fetch(`${this.url}/rest/v1/giocatori`, {
+            method: 'POST',
+            headers: {
+                ...this.getAuthHeaders(),
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+                nome: player.nome,
+                forma: player.forma,
+                difesa: player.difesa,
+                passaggi: player.passaggi,
+                attacco: player.attacco,
+                dribbling: player.dribbling,
+                ruolo: player.ruolo,
+                attivo: true
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Errore nell\'aggiunta del giocatore');
+        }
+        
+        const data = await response.json();
+        return this.mapPlayer(data[0]);
+    }
+
+    async updatePlayer(id, player) {
+        const response = await fetch(`${this.url}/rest/v1/giocatori?id=eq.${id}`, {
+            method: 'PATCH',
+            headers: {
+                ...this.getAuthHeaders(),
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+                nome: player.nome,
+                forma: player.forma,
+                difesa: player.difesa,
+                passaggi: player.passaggi,
+                attacco: player.attacco,
+                dribbling: player.dribbling,
+                ruolo: player.ruolo
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Errore nell\'aggiornamento del giocatore');
+        }
+        
+        const data = await response.json();
+        return this.mapPlayer(data[0]);
+    }
+
+    async deletePlayer(id) {
+        const response = await fetch(`${this.url}/rest/v1/giocatori?id=eq.${id}`, {
+            method: 'PATCH',
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify({ attivo: false })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Errore nella cancellazione del giocatore');
         }
     }
 
@@ -43,24 +161,6 @@ class SupabaseClient {
             ruolo: dbPlayer.ruolo,
             attivo: dbPlayer.attivo
         };
-    }
-
-    // Dati mock per sviluppo/demo
-    getMockPlayers() {
-        return [
-            { id: 1, nome: 'Marco Rossi', forma: 8, difesa: 7, passaggi: 8, attacco: 6, dribbling: 7, ruolo: 'CEN', attivo: true },
-            { id: 2, nome: 'Luca Bianchi', forma: 7, difesa: 9, passaggi: 6, attacco: 5, dribbling: 6, ruolo: 'DIF', attivo: true },
-            { id: 3, nome: 'Andrea Verdi', forma: 9, difesa: 5, passaggi: 7, attacco: 9, dribbling: 8, ruolo: 'ATT', attivo: true },
-            { id: 4, nome: 'Paolo Neri', forma: 6, difesa: 8, passaggi: 7, attacco: 6, dribbling: 5, ruolo: 'DIF', attivo: true },
-            { id: 5, nome: 'Giovanni Gialli', forma: 8, difesa: 6, passaggi: 9, attacco: 7, dribbling: 7, ruolo: 'CEN', attivo: true },
-            { id: 6, nome: 'Stefano Blu', forma: 7, difesa: 6, passaggi: 6, attacco: 8, dribbling: 9, ruolo: 'ATT', attivo: true },
-            { id: 7, nome: 'Matteo Viola', forma: 9, difesa: 7, passaggi: 8, attacco: 7, dribbling: 6, ruolo: 'JOLLY', attivo: true },
-            { id: 8, nome: 'Davide Arancio', forma: 6, difesa: 9, passaggi: 5, attacco: 6, dribbling: 5, ruolo: 'DIF', attivo: true },
-            { id: 9, nome: 'Simone Rosa', forma: 8, difesa: 5, passaggi: 7, attacco: 9, dribbling: 8, ruolo: 'ATT', attivo: true },
-            { id: 10, nome: 'Federico Grigio', forma: 7, difesa: 7, passaggi: 8, attacco: 6, dribbling: 7, ruolo: 'CEN', attivo: true },
-            { id: 11, nome: 'Alessandro Marrone', forma: 8, difesa: 8, passaggi: 7, attacco: 7, dribbling: 6, ruolo: 'JOLLY', attivo: true },
-            { id: 12, nome: 'Roberto Azzurro', forma: 6, difesa: 6, passaggi: 9, attacco: 7, dribbling: 8, ruolo: 'CEN', attivo: true }
-        ];
     }
 }
 

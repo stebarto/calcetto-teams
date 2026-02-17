@@ -18,6 +18,40 @@
     <link rel="apple-touch-icon" href="assets/icon-192.png">
 </head>
 <body>
+    <!-- Schermata Login Admin -->
+    <div id="loginScreen" class="screen">
+        <div class="container-fluid">
+            <div class="login-container">
+                <h2>Admin Login</h2>
+                <p>Inserisci la tua email per gestire i giocatori</p>
+                <form id="loginForm">
+                    <input type="email" id="emailInput" class="form-control" placeholder="tua@email.com" required>
+                    <button type="submit" class="btn btn-primary">Invia Magic Link</button>
+                </form>
+                <button id="backToAppBtn" class="btn btn-secondary mt-3">Torna all'App</button>
+                <div id="loginMessage" class="alert mt-3" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schermata Gestione Giocatori -->
+    <div id="manageScreen" class="screen">
+        <header class="app-header">
+            <h1>Gestione Giocatori</h1>
+            <button id="logoutBtn" class="btn btn-sm btn-secondary">Logout</button>
+        </header>
+        <div class="container-fluid">
+            <div id="managePlayers" class="list-group">
+                <!-- Giocatori con opzioni edit/delete -->
+            </div>
+        </div>
+        <div class="sticky-bottom">
+            <button id="addPlayerBtn" class="btn btn-primary btn-generate">
+                <i class="bi bi-plus-lg"></i> Aggiungi Giocatore
+            </button>
+        </div>
+    </div>
+
     <!-- Schermata Selezione Giocatori -->
     <div id="selectionScreen" class="screen active">
         <header class="app-header">
@@ -82,12 +116,76 @@
         </div>
     </div>
 
+    <!-- FAB Admin Button -->
+    <button id="adminFab" class="fab-button" title="Gestione Admin">
+        <i class="bi bi-gear-fill"></i>
+    </button>
+
+    <!-- Modal Aggiungi/Modifica Giocatore -->
+    <div class="modal fade" id="playerModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Aggiungi Giocatore</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="playerForm">
+                        <input type="hidden" id="playerId">
+                        <div class="mb-3">
+                            <label class="form-label">Nome Completo</label>
+                            <input type="text" class="form-control" id="playerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ruolo</label>
+                            <select class="form-select" id="playerRole" required>
+                                <option value="DIF">Difensore</option>
+                                <option value="CEN">Centrocampista</option>
+                                <option value="ATT">Attaccante</option>
+                                <option value="JOLLY">Jolly</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Forma (1-10)</label>
+                                <input type="number" class="form-control" id="playerForma" min="1" max="10" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Difesa (1-10)</label>
+                                <input type="number" class="form-control" id="playerDifesa" min="1" max="10" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Passaggi (1-10)</label>
+                                <input type="number" class="form-control" id="playerPassaggi" min="1" max="10" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Attacco (1-10)</label>
+                                <input type="number" class="form-control" id="playerAttacco" min="1" max="10" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dribbling (1-10)</label>
+                            <input type="number" class="form-control" id="playerDribbling" min="1" max="10" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-primary" id="savePlayerBtn">Salva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- App JS -->
     <script src="js/supabase.js"></script>
     <script src="js/generator.js"></script>
+    <script src="js/admin.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
