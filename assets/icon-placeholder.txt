@@ -1,0 +1,9 @@
+Per le icone PWA, puoi:
+
+1. Creare icone 192x192 e 512x512 con il logo dell'app
+2. Usare un tool online come https://realfavicongenerator.net/
+3. Salvare come icon-192.png e icon-512.png in questa cartella
+
+Colori suggeriti:
+- Background: #C8F35A (lime)
+- Icona: simbolo calcio o squadre stilizzato

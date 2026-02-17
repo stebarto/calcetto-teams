@@ -1,0 +1,22 @@
+{
+  "name": "Calcetto Teams",
+  "short_name": "Calcetto",
+  "description": "Generatore squadre calcetto 5 vs 5",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F2F2F2",
+  "theme_color": "#C8F35A",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

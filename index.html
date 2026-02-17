@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#C8F35A">
+    <title>Calcetto Teams</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+</head>
+<body>
+    <!-- Schermata Selezione Giocatori -->
+    <div id="selectionScreen" class="screen active">
+        <header class="app-header">
+            <h1>Calcetto Teams</h1>
+            <div class="counter">
+                <span id="selectedCount">0</span> / 10 selezionati
+            </div>
+        </header>
+
+        <div class="container-fluid">
+            <div id="playersList" class="list-group">
+                <!-- Giocatori caricati dinamicamente -->
+            </div>
+        </div>
+
+        <div class="sticky-bottom">
+            <button id="generateBtn" class="btn btn-primary btn-generate" disabled>
+                Genera Squadre
+            </button>
+        </div>
+    </div>
+
+    <!-- Schermata Risultato Squadre -->
+    <div id="resultScreen" class="screen">
+        <header class="result-header">
+            <h2>5 vs 5</h2>
+            <div id="balanceIndicator" class="balance-indicator">
+                Equilibrio <span id="balanceValue">--</span>%
+            </div>
+        </header>
+
+        <div class="teams-container">
+            <div class="row g-0">
+                <div class="col-6 team-column team-a">
+                    <div class="team-header">
+                        <h3>Squadra A</h3>
+                        <div class="team-score" id="teamAScore">0.0</div>
+                    </div>
+                    <div id="teamAPlayers" class="players-list">
+                        <!-- Giocatori squadra A -->
+                    </div>
+                </div>
+                <div class="col-6 team-column team-b">
+                    <div class="team-header">
+                        <h3>Squadra B</h3>
+                        <div class="team-score" id="teamBScore">0.0</div>
+                    </div>
+                    <div id="teamBPlayers" class="players-list">
+                        <!-- Giocatori squadra B -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sticky-bottom actions-bar">
+            <button id="resetBtn" class="btn btn-secondary">
+                <i class="bi bi-trash"></i> Reset
+            </button>
+            <button id="regenerateBtn" class="btn btn-primary">
+                <i class="bi bi-arrow-clockwise"></i> Rigenera
+            </button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- App JS -->
+    <script src="js/supabase.js"></script>
+    <script src="js/generator.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
