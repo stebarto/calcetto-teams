@@ -41,6 +41,14 @@ const adminUI = {
         const email = document.getElementById('emailInput').value;
         const messageEl = document.getElementById('loginMessage');
         
+        // Verifica email autorizzata
+        if (email !== 'stebarto@gmail.com') {
+            messageEl.className = 'alert alert-danger';
+            messageEl.textContent = 'Email non autorizzata. Solo l\'admin può accedere.';
+            messageEl.style.display = 'block';
+            return;
+        }
+        
         try {
             await supabase.signInWithOtp(email);
             messageEl.className = 'alert alert-success';

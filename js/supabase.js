@@ -16,13 +16,14 @@ class SupabaseClient {
 
     // Auth methods
     async signInWithOtp(email) {
+        const redirectTo = window.location.origin + window.location.pathname;
         const response = await fetch(`${this.url}/auth/v1/otp`, {
             method: 'POST',
             headers: this.headers,
             body: JSON.stringify({
                 email,
                 options: {
-                    emailRedirectTo: window.location.origin
+                    emailRedirectTo: redirectTo
                 }
             })
         });
