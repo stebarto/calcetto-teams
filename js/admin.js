@@ -29,13 +29,11 @@ const adminUI = {
     showLogin() {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('loginScreen').classList.add('active');
-        document.getElementById('adminFab').style.display = 'none';
     },
 
     backToApp() {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('selectionScreen').classList.add('active');
-        document.getElementById('adminFab').style.display = 'block';
     },
 
     async handleLogin(e) {
@@ -63,7 +61,6 @@ const adminUI = {
     async showManageScreen() {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('manageScreen').classList.add('active');
-        document.getElementById('adminFab').style.display = 'none';
         await this.loadManagePlayers();
     },
 

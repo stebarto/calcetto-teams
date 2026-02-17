@@ -332,28 +332,39 @@ body {
 /* FAB Button */
 .fab-button {
     position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 56px;
-    height: 56px;
+    bottom: 90px; /* Sopra il bottone sticky */
+    right: 20px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background: var(--dark-panel);
     color: var(--text-light);
     border: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    font-size: 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    font-size: 26px;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 1001; /* Sopra tutto */
     transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .fab-button:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    background: #2A2A2A;
 }
 
 .fab-button:active {
     transform: scale(0.95);
+}
+
+/* Nascondi FAB quando non nella schermata principale */
+#resultScreen.active ~ .fab-button,
+#loginScreen.active ~ .fab-button,
+#manageScreen.active ~ .fab-button {
+    display: none;
 }
 
 /* Login Screen */
