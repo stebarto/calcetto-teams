@@ -27,7 +27,6 @@ function renderPlayersList() {
     playersList.innerHTML = '';
     
     state.players.forEach(player => {
-        const overall = generator.calculateOverall(player).toFixed(1);
         const isSelected = state.selectedPlayers.includes(player.id);
         const isDisabled = !isSelected && state.selectedPlayers.length >= 10;
         
@@ -36,9 +35,8 @@ function renderPlayersList() {
         item.innerHTML = `
             <div class="player-info">
                 <div class="player-name">${player.nome}</div>
-                <div class="player-role">${player.ruolo}</div>
+                <span class="role-badge role-${player.ruolo.toLowerCase()}">${getRoleLabel(player.ruolo)}</span>
             </div>
-            <div class="player-overall">${overall}</div>
         `;
         
         if (!isDisabled) {
@@ -47,6 +45,17 @@ function renderPlayersList() {
         
         playersList.appendChild(item);
     });
+}
+
+// Helper per label ruoli
+function getRoleLabel(ruolo) {
+    const labels = {
+        'DIF': 'Difensore',
+        'CEN': 'Centrocampista',
+        'ATT': 'Attaccante',
+        'JOLLY': 'Jolly'
+    };
+    return labels[ruolo] || ruolo;
 }
 
 // Toggle selezione giocatore

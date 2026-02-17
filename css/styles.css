@@ -101,17 +101,36 @@ body {
     margin-bottom: 4px;
 }
 
-.player-role {
-    font-size: 12px;
-    color: #666;
+/* Role badges */
+.role-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    margin-top: 4px;
 }
 
-.player-overall {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text-dark);
+.role-dif {
+    background: #3498db;
+    color: white;
+}
+
+.role-cen {
+    background: #2ecc71;
+    color: white;
+}
+
+.role-att {
+    background: #e74c3c;
+    color: white;
+}
+
+.role-jolly {
+    background: #f39c12;
+    color: white;
 }
 
 /* Bottone genera */
