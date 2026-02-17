@@ -1,21 +1,47 @@
 # Calcetto Teams
 
-Progressive Web App per generare squadre di calcetto 5 vs 5 bilanciate.
+A Progressive Web App for generating balanced 5v5 soccer teams with an optimized mobile-first experience.
 
-## Caratteristiche
+## Features
 
-- ⚡ Veloce e ottimizzata per mobile
-- 🎨 Design moderno con palette lime sportiva
-- 📱 Installabile come app su iPhone
-- ⚖️ Algoritmo di bilanciamento squadre
-- 🔄 Rigenerazione multipla per risultato ottimale
+- Lightweight vanilla JavaScript implementation with zero framework dependencies
+- Mobile-optimized UI with custom design system (no default Bootstrap styling)
+- Installable PWA with offline support via Service Worker
+- Multi-iteration balancing algorithm (50 attempts) for optimal team distribution
+- Real-time balance calculation with visual feedback
+- Supabase integration with fallback to mock data for development
 
-## Setup
+## Tech Stack
 
-### 1. Configurazione Supabase
+- **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3
+- **CSS Framework**: Bootstrap 5 (grid system only)
+- **Database**: Supabase (PostgreSQL with REST API)
+- **PWA**: Service Worker + Web App Manifest
+- **Hosting**: GitHub Pages (static deployment)
 
-1. Crea un progetto su [Supabase](https://supabase.com)
-2. Crea la tabella `giocatori`:
+## Quick Start
+
+### Local Development
+
+```bash
+# Clone the repository
+git clone https://github.com/stebarto/calcetto-teams.git
+cd calcetto-teams
+
+# Serve with any static server
+python -m http.server 8000
+# or
+npx serve
+```
+
+Visit `http://localhost:8000`
+
+### Supabase Configuration (Optional)
+
+The app works out-of-the-box with mock data. To use real data:
+
+1. Create a Supabase project at [supabase.com](https://supabase.com)
+2. Run the following SQL migration:
 
 ```sql
 CREATE TABLE giocatori (
@@ -30,59 +56,71 @@ CREATE TABLE giocatori (
   attivo BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Enable RLS
+ALTER TABLE giocatori ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access
+CREATE POLICY "Allow public read" ON giocatori
+  FOR SELECT USING (true);
 ```
 
-3. Abilita Row Level Security e aggiungi policy per SELECT pubblico
-4. Copia URL e ANON KEY del progetto
-5. Modifica `js/supabase.js` con le tue credenziali
+3. Update `js/supabase.js` with your credentials:
 
-### 2. Sviluppo locale
+```javascript
+const SUPABASE_URL = 'your-project-url';
+const SUPABASE_ANON_KEY = 'your-anon-key';
+```
+
+## Architecture
+
+```
+├── index.html              # Main HTML with two screens (selection/result)
+├── manifest.json           # PWA manifest
+├── service-worker.js       # Offline caching strategy
+├── css/
+│   └── styles.css         # Custom design system
+├── js/
+│   ├── app.js             # Main application logic & state management
+│   ├── supabase.js        # Database client with mock fallback
+│   └── generator.js       # Team balancing algorithm
+└── assets/
+    └── icon-*.png         # PWA icons
+```
+
+## Algorithm
+
+The team generator uses a weighted overall calculation:
+
+```javascript
+overall = forma × 0.25 + difesa × 0.20 + passaggi × 0.20 
+        + attacco × 0.20 + dribbling × 0.15
+```
+
+Teams are balanced through:
+1. 50 randomized iterations
+2. Greedy assignment (weakest team gets next player)
+3. Selection of iteration with highest balance percentage
+
+Balance score: `(min_score / max_score) × 100`
+
+## Deployment
+
+Deployed automatically via GitHub Pages on push to `main`:
 
 ```bash
-# Usa un server locale (es. Live Server in VS Code)
-# oppure
-python -m http.server 8000
+git push origin main
 ```
 
-### 3. Deploy su GitHub Pages
+Live at: [https://stebarto.github.io/calcetto-teams](https://stebarto.github.io/calcetto-teams)
 
-1. Crea repository su GitHub
-2. Push del codice
-3. Settings > Pages > Deploy from branch main
-4. L'app sarà disponibile su `https://username.github.io/repo-name`
+## PWA Installation
 
-## Struttura progetto
+On iOS Safari:
+1. Open the app URL
+2. Tap Share button
+3. Select "Add to Home Screen"
 
-```
-/
-├── index.html
-├── manifest.json
-├── service-worker.js
-├── css/
-│   └── styles.css
-├── js/
-│   ├── app.js
-│   ├── supabase.js
-│   └── generator.js
-└── assets/
-    ├── icon-192.png
-    └── icon-512.png
-```
+## License
 
-## Uso
-
-1. Seleziona 10 giocatori dalla lista
-2. Premi "Genera Squadre"
-3. Visualizza le squadre bilanciate
-4. Rigenera o reset per ricominciare
-
-## Tecnologie
-
-- HTML5 + CSS3 + JavaScript vanilla
-- Bootstrap 5 (solo griglia)
-- Supabase (database)
-- PWA (manifest + service worker)
-
-## Note
-
-L'app include dati mock per demo. Configura Supabase per usare dati reali.
+MIT
