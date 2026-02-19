@@ -111,12 +111,6 @@ function showResultScreen() {
 function renderTeams() {
     const { teamA, teamB, balance } = state.teams;
     
-    console.log('renderTeams called with:', {
-        teamA: teamA.map(p => p.nome),
-        teamB: teamB.map(p => p.nome),
-        balance
-    });
-    
     // Aggiorna punteggi
     const scoreA = generator.getTeamScore(teamA).toFixed(1);
     const scoreB = generator.getTeamScore(teamB).toFixed(1);
@@ -138,19 +132,13 @@ function renderTeams() {
     }
     
     // Render giocatori
-    console.log('Rendering teamAPlayers...');
     renderTeamPlayers('teamAPlayers', teamA);
-    console.log('Rendering teamBPlayers...');
     renderTeamPlayers('teamBPlayers', teamB);
-    console.log('Render complete');
 }
 
 // Render giocatori squadra
 function renderTeamPlayers(containerId, team) {
     const container = document.getElementById(containerId);
-    console.log(`renderTeamPlayers for ${containerId}:`, team.map(p => p.nome));
-    console.log('Container found:', container);
-    
     container.innerHTML = '';
     
     team.forEach(player => {
@@ -164,8 +152,6 @@ function renderTeamPlayers(containerId, team) {
         `;
         container.appendChild(div);
     });
-    
-    console.log(`${containerId} innerHTML updated:`, container.innerHTML.substring(0, 100));
 }
 
 // Reset
@@ -181,28 +167,16 @@ function reset() {
 
 // Rigenera
 function regenerate() {
-    console.log('Regenerate called');
-    console.log('Selected players:', state.selectedPlayers);
-    
     const selectedPlayerObjects = state.players.filter(p => 
         state.selectedPlayers.includes(p.id)
     );
     
-    console.log('Selected player objects:', selectedPlayerObjects);
-    
     // Usa il metodo random per generare una nuova combinazione
     const result = generator.generateRandomTeams(selectedPlayerObjects);
-    console.log('New result:', result);
-    console.log('Team A players:', result.teamA.map(p => p.nome));
-    console.log('Team B players:', result.teamB.map(p => p.nome));
-    console.log('Balance:', result.balance);
-    
     state.teams = result;
     state.balance = result.balance;
     
-    console.log('State updated, rendering...');
     renderTeams();
-    console.log('Render complete');
 }
 
 // Event listeners

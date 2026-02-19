@@ -26,8 +26,6 @@ class SupabaseClient {
             redirectTo = 'https://stebarto.github.io/calcetto-teams/';
         }
         
-        console.log('SignInWithOtp - Redirect URL:', redirectTo);
-        
         const response = await fetch(`${this.url}/auth/v1/otp`, {
             method: 'POST',
             headers: this.headers,
