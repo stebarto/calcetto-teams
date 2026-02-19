@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calcetto-teams-v6';
+const CACHE_NAME = 'calcetto-teams-v7';
 const urlsToCache = [
   './',
   './index.html',

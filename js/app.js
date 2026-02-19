@@ -19,7 +19,16 @@ const regenerateBtn = document.getElementById('regenerateBtn');
 async function init() {
     state.players = await supabase.getPlayers();
     renderPlayersList();
+    updateTotalPlayers();
     setupEventListeners();
+}
+
+// Aggiorna contatore totale giocatori
+function updateTotalPlayers() {
+    const totalPlayersEl = document.getElementById('totalPlayers');
+    if (totalPlayersEl) {
+        totalPlayersEl.textContent = state.players.length;
+    }
 }
 
 // Render lista giocatori
@@ -138,7 +147,6 @@ function renderTeamPlayers(containerId, team) {
         div.innerHTML = `
             <div class="result-player-name">
                 <span>${player.nome}</span>
-                <span class="result-player-overall">${player.overall.toFixed(1)}</span>
             </div>
             <div class="result-player-role">${player.ruolo}</div>
         `;
