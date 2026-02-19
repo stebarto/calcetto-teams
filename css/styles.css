@@ -301,7 +301,7 @@ body {
 .result-header {
     background: linear-gradient(180deg, var(--sky-blue) 0%, #3a7bc8 100%);
     color: white;
-    padding: 30px 20px;
+    padding: 20px 20px;
     text-align: center;
     border-bottom: 4px solid var(--sunny-yellow);
     box-shadow: 0 4px 16px rgba(0,0,0,0.3);
@@ -315,36 +315,31 @@ body {
 }
 
 .balance-label {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     opacity: 0.9;
 }
 
 .balance-value-large {
-    font-size: 72px;
+    font-size: 64px;
     font-weight: 900;
-    text-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.4);
     line-height: 1;
+    color: white;
 }
 
 .balance-value-large::after {
     content: '%';
-    font-size: 48px;
+    font-size: 40px;
     margin-left: 4px;
 }
 
-.balance-indicator-large.excellent .balance-value-large {
-    color: var(--bright-green);
-}
-
-.balance-indicator-large.good .balance-value-large {
-    color: var(--sunny-yellow);
-}
-
+.balance-indicator-large.excellent .balance-value-large,
+.balance-indicator-large.good .balance-value-large,
 .balance-indicator-large.poor .balance-value-large {
-    color: var(--red);
+    color: white;
 }
 
 /* Container squadre */
@@ -353,8 +348,8 @@ body {
 }
 
 .team-column {
-    padding: 20px;
-    min-height: 500px;
+    padding: 16px;
+    min-height: 400px;
 }
 
 .team-a {
@@ -370,23 +365,24 @@ body {
 
 .team-header {
     text-align: center;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
     border-bottom: 3px solid rgba(255,255,255,0.5);
 }
 
 .team-header h3 {
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 900;
     margin-bottom: 8px;
     text-transform: uppercase;
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+    white-space: nowrap;
 }
 
 .team-score {
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 900;
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
     opacity: 0.8;
 }
 
@@ -394,32 +390,32 @@ body {
 .players-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .result-player {
-    padding: 12px;
+    padding: 10px;
     border-radius: 8px;
     border: 2px solid rgba(255,255,255,0.3);
     text-transform: uppercase;
     background: rgba(0,0,0,0.2);
     box-shadow: 0 2px 0 rgba(0,0,0,0.3);
-    min-height: 60px;
+    min-height: 55px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
 .result-player-name {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 900;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     line-height: 1.2;
     word-wrap: break-word;
 }
 
 .result-player-role {
-    font-size: 11px;
+    font-size: 10px;
     opacity: 0.9;
     text-transform: uppercase;
     font-weight: 700;
