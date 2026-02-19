@@ -266,39 +266,50 @@ body {
 .result-header {
     background: linear-gradient(180deg, var(--sky-blue) 0%, #3a7bc8 100%);
     color: white;
-    padding: 20px;
+    padding: 30px 20px;
     text-align: center;
     border-bottom: 4px solid var(--sunny-yellow);
     box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
 
-.result-header h2 {
-    font-size: 36px;
-    font-weight: 900;
-    margin-bottom: 8px;
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-    text-transform: uppercase;
+.balance-indicator-large {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
 }
 
-.balance-indicator {
-    font-size: 20px;
+.balance-label {
+    font-size: 18px;
     font-weight: 900;
     text-transform: uppercase;
+    letter-spacing: 3px;
+    opacity: 0.9;
 }
 
-.balance-indicator.excellent {
+.balance-value-large {
+    font-size: 72px;
+    font-weight: 900;
+    text-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+    line-height: 1;
+}
+
+.balance-value-large::after {
+    content: '%';
+    font-size: 48px;
+    margin-left: 4px;
+}
+
+.balance-indicator-large.excellent .balance-value-large {
     color: var(--bright-green);
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
 }
 
-.balance-indicator.good {
+.balance-indicator-large.good .balance-value-large {
     color: var(--sunny-yellow);
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
 }
 
-.balance-indicator.poor {
+.balance-indicator-large.poor .balance-value-large {
     color: var(--red);
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
 }
 
 /* Container squadre */
@@ -338,9 +349,10 @@ body {
 }
 
 .team-score {
-    font-size: 48px;
+    font-size: 32px;
     font-weight: 900;
     text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+    opacity: 0.8;
 }
 
 /* Lista giocatori risultato */

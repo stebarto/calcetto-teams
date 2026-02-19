@@ -20,7 +20,7 @@ class TeamGenerator {
         let bestResult = null;
         let bestBalance = 0;
 
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 100; i++) {
             const result = this.generateSingleAttempt([...players]);
             const balance = this.calculateBalance(result.teamA, result.teamB);
             
@@ -34,6 +34,22 @@ class TeamGenerator {
             teamA: bestResult.teamA,
             teamB: bestResult.teamB,
             balance: bestBalance
+        };
+    }
+
+    // Genera una singola combinazione casuale (per rigenera)
+    generateRandomTeams(players) {
+        if (players.length !== 10) {
+            throw new Error('Servono esattamente 10 giocatori');
+        }
+
+        const result = this.generateSingleAttempt([...players]);
+        const balance = this.calculateBalance(result.teamA, result.teamB);
+
+        return {
+            teamA: result.teamA,
+            teamB: result.teamB,
+            balance: balance
         };
     }
 

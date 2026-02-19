@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#4A90E2">
-    <title>Calcetto Teams</title>
+    <title>KickSplit</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon_io/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon_io/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon_io/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon_io/apple-touch-icon.png">
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -15,7 +21,6 @@
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="assets/icon-192.png">
 </head>
 <body>
     <!-- Schermata Login Admin -->
@@ -55,7 +60,7 @@
     <!-- Schermata Selezione Giocatori -->
     <div id="selectionScreen" class="screen active">
         <header class="app-header">
-            <h1>Calcetto Teams</h1>
+            <h1>KickSplit</h1>
             <div class="counter">
                 <span id="selectedCount">0</span> / 10 selezionati
             </div>
@@ -80,9 +85,9 @@
     <!-- Schermata Risultato Squadre -->
     <div id="resultScreen" class="screen">
         <header class="result-header">
-            <h2>5 vs 5</h2>
-            <div id="balanceIndicator" class="balance-indicator">
-                Equilibrio <span id="balanceValue">--</span>%
+            <div id="balanceIndicator" class="balance-indicator-large">
+                <div class="balance-label">EQUILIBRIO</div>
+                <div class="balance-value-large" id="balanceValue">--</div>
             </div>
         </header>
 

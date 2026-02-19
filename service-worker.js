@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calcetto-teams-v7';
+const CACHE_NAME = 'kicksplit-v1';
 const urlsToCache = [
   './',
   './index.html',
@@ -7,7 +7,11 @@ const urlsToCache = [
   './js/supabase.js',
   './js/generator.js',
   './js/admin.js',
-  './manifest.json'
+  './manifest.json',
+  './assets/favicon_io/favicon.ico',
+  './assets/favicon_io/android-chrome-192x192.png',
+  './assets/favicon_io/android-chrome-512x512.png',
+  './assets/favicon_io/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', event => {

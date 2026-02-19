@@ -118,11 +118,11 @@ function renderTeams() {
     document.getElementById('teamAScore').textContent = scoreA;
     document.getElementById('teamBScore').textContent = scoreB;
     
-    // Aggiorna equilibrio
+    // Aggiorna equilibrio con nuovo design
     const balanceIndicator = document.getElementById('balanceIndicator');
     document.getElementById('balanceValue').textContent = balance;
     
-    balanceIndicator.className = 'balance-indicator';
+    balanceIndicator.className = 'balance-indicator-large';
     if (balance >= 90) {
         balanceIndicator.classList.add('excellent');
     } else if (balance >= 80) {
@@ -167,7 +167,16 @@ function reset() {
 
 // Rigenera
 function regenerate() {
-    generateTeams();
+    const selectedPlayerObjects = state.players.filter(p => 
+        state.selectedPlayers.includes(p.id)
+    );
+    
+    // Usa il metodo random per generare una nuova combinazione
+    const result = generator.generateRandomTeams(selectedPlayerObjects);
+    state.teams = result;
+    state.balance = result.balance;
+    
+    renderTeams();
 }
 
 // Event listeners

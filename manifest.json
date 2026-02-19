@@ -1,6 +1,6 @@
 {
-  "name": "Calcetto Teams",
-  "short_name": "Calcetto",
+  "name": "KickSplit",
+  "short_name": "KickSplit",
   "description": "Generatore squadre calcetto 5 vs 5",
   "start_url": "./index.html",
   "scope": "./",
@@ -10,14 +10,16 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "assets/icon-192.png",
+      "src": "assets/favicon_io/android-chrome-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "assets/icon-512.png",
+      "src": "assets/favicon_io/android-chrome-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
