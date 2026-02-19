@@ -167,16 +167,25 @@ function reset() {
 
 // Rigenera
 function regenerate() {
+    console.log('Regenerate called');
+    console.log('Selected players:', state.selectedPlayers);
+    
     const selectedPlayerObjects = state.players.filter(p => 
         state.selectedPlayers.includes(p.id)
     );
     
+    console.log('Selected player objects:', selectedPlayerObjects);
+    
     // Usa il metodo random per generare una nuova combinazione
     const result = generator.generateRandomTeams(selectedPlayerObjects);
+    console.log('New result:', result);
+    
     state.teams = result;
     state.balance = result.balance;
     
+    console.log('State updated, rendering...');
     renderTeams();
+    console.log('Render complete');
 }
 
 // Event listeners

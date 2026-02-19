@@ -60,7 +60,12 @@
     <!-- Schermata Selezione Giocatori -->
     <div id="selectionScreen" class="screen active">
         <header class="app-header">
-            <h1>KickSplit</h1>
+            <div class="header-content">
+                <h1>KickSplit</h1>
+                <button id="adminFab" class="admin-button" title="Gestione Admin">
+                    <i class="bi bi-gear-fill"></i>
+                </button>
+            </div>
             <div class="counter">
                 <span id="selectedCount">0</span> / 10 selezionati
             </div>
@@ -123,11 +128,6 @@
             </button>
         </div>
     </div>
-
-    <!-- FAB Admin Button -->
-    <button id="adminFab" class="fab-button" title="Gestione Admin">
-        <i class="bi bi-gear-fill"></i>
-    </button>
 
     <!-- Modal Aggiungi/Modifica Giocatore -->
     <div class="modal fade" id="playerModal" tabindex="-1">
