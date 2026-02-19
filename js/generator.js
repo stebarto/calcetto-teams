@@ -44,13 +44,29 @@ class TeamGenerator {
         }
 
         console.log('generateRandomTeams - Input players:', players.map(p => p.nome));
-        const result = this.generateSingleAttempt([...players]);
-        console.log('generateRandomTeams - After shuffle, Team A:', result.teamA.map(p => p.nome));
-        const balance = this.calculateBalance(result.teamA, result.teamB);
+        
+        // Shuffle completo dei giocatori
+        const shuffled = this.shuffle([...players]);
+        console.log('After shuffle:', shuffled.map(p => p.nome));
+        
+        // Calcola overall per ogni giocatore
+        const playersWithOverall = shuffled.map(p => ({
+            ...p,
+            overall: this.calculateOverall(p)
+        }));
+
+        // Dividi semplicemente in due gruppi da 5
+        const teamA = playersWithOverall.slice(0, 5);
+        const teamB = playersWithOverall.slice(5, 10);
+        
+        console.log('generateRandomTeams - Team A:', teamA.map(p => p.nome));
+        console.log('generateRandomTeams - Team B:', teamB.map(p => p.nome));
+        
+        const balance = this.calculateBalance(teamA, teamB);
 
         return {
-            teamA: result.teamA,
-            teamB: result.teamB,
+            teamA: teamA,
+            teamB: teamB,
             balance: balance
         };
     }

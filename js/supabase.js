@@ -19,10 +19,14 @@ class SupabaseClient {
         // Determina l'URL di redirect in base all'ambiente
         let redirectTo;
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            redirectTo = 'http://localhost:3000/';
+            // In locale usa l'URL completo corrente
+            redirectTo = window.location.origin + window.location.pathname;
         } else {
+            // In produzione usa l'URL fisso di GitHub Pages
             redirectTo = 'https://stebarto.github.io/calcetto-teams/';
         }
+        
+        console.log('SignInWithOtp - Redirect URL:', redirectTo);
         
         const response = await fetch(`${this.url}/auth/v1/otp`, {
             method: 'POST',
