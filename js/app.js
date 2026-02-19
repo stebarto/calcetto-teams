@@ -179,6 +179,9 @@ function regenerate() {
     // Usa il metodo random per generare una nuova combinazione
     const result = generator.generateRandomTeams(selectedPlayerObjects);
     console.log('New result:', result);
+    console.log('Team A players:', result.teamA.map(p => p.nome));
+    console.log('Team B players:', result.teamB.map(p => p.nome));
+    console.log('Balance:', result.balance);
     
     state.teams = result;
     state.balance = result.balance;

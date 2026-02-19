@@ -43,7 +43,9 @@ class TeamGenerator {
             throw new Error('Servono esattamente 10 giocatori');
         }
 
+        console.log('generateRandomTeams - Input players:', players.map(p => p.nome));
         const result = this.generateSingleAttempt([...players]);
+        console.log('generateRandomTeams - After shuffle, Team A:', result.teamA.map(p => p.nome));
         const balance = this.calculateBalance(result.teamA, result.teamB);
 
         return {
@@ -56,6 +58,7 @@ class TeamGenerator {
     generateSingleAttempt(players) {
         // Shuffle per randomizzare
         const shuffled = this.shuffle(players);
+        console.log('After shuffle:', shuffled.map(p => p.nome));
         
         // Calcola overall per ogni giocatore
         const playersWithOverall = shuffled.map(p => ({
@@ -65,6 +68,7 @@ class TeamGenerator {
 
         // Ordina per overall decrescente
         playersWithOverall.sort((a, b) => b.overall - a.overall);
+        console.log('After sort by overall:', playersWithOverall.map(p => `${p.nome}(${p.overall.toFixed(1)})`));
 
         const teamA = [];
         const teamB = [];
