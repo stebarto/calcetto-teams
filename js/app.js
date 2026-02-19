@@ -111,6 +111,12 @@ function showResultScreen() {
 function renderTeams() {
     const { teamA, teamB, balance } = state.teams;
     
+    console.log('renderTeams called with:', {
+        teamA: teamA.map(p => p.nome),
+        teamB: teamB.map(p => p.nome),
+        balance
+    });
+    
     // Aggiorna punteggi
     const scoreA = generator.getTeamScore(teamA).toFixed(1);
     const scoreB = generator.getTeamScore(teamB).toFixed(1);
@@ -132,13 +138,19 @@ function renderTeams() {
     }
     
     // Render giocatori
+    console.log('Rendering teamAPlayers...');
     renderTeamPlayers('teamAPlayers', teamA);
+    console.log('Rendering teamBPlayers...');
     renderTeamPlayers('teamBPlayers', teamB);
+    console.log('Render complete');
 }
 
 // Render giocatori squadra
 function renderTeamPlayers(containerId, team) {
     const container = document.getElementById(containerId);
+    console.log(`renderTeamPlayers for ${containerId}:`, team.map(p => p.nome));
+    console.log('Container found:', container);
+    
     container.innerHTML = '';
     
     team.forEach(player => {
@@ -152,6 +164,8 @@ function renderTeamPlayers(containerId, team) {
         `;
         container.appendChild(div);
     });
+    
+    console.log(`${containerId} innerHTML updated:`, container.innerHTML.substring(0, 100));
 }
 
 // Reset
