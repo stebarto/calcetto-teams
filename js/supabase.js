@@ -16,7 +16,14 @@ class SupabaseClient {
 
     // Auth methods
     async signInWithOtp(email) {
-        const redirectTo = window.location.origin + window.location.pathname;
+        // Determina l'URL di redirect in base all'ambiente
+        let redirectTo;
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            redirectTo = 'http://localhost:3000/';
+        } else {
+            redirectTo = 'https://stebarto.github.io/calcetto-teams/';
+        }
+        
         const response = await fetch(`${this.url}/auth/v1/otp`, {
             method: 'POST',
             headers: this.headers,

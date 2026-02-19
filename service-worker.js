@@ -1,13 +1,13 @@
-const CACHE_NAME = 'calcetto-teams-v4';
+const CACHE_NAME = 'calcetto-teams-v6';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/app.js',
-  '/js/supabase.js',
-  '/js/generator.js',
-  '/js/admin.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './css/styles.css',
+  './js/app.js',
+  './js/supabase.js',
+  './js/generator.js',
+  './js/admin.js',
+  './manifest.json'
 ];
 
 self.addEventListener('install', event => {
