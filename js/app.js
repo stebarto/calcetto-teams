@@ -14,6 +14,7 @@ const selectedCount = document.getElementById('selectedCount');
 const generateBtn = document.getElementById('generateBtn');
 const resetBtn = document.getElementById('resetBtn');
 const regenerateBtn = document.getElementById('regenerateBtn');
+const confirmMatchBtn = document.getElementById('confirmMatchBtn');
 
 // Inizializzazione
 async function init() {
@@ -184,6 +185,7 @@ function setupEventListeners() {
     generateBtn.addEventListener('click', generateTeams);
     resetBtn.addEventListener('click', reset);
     regenerateBtn.addEventListener('click', regenerate);
+    confirmMatchBtn.addEventListener('click', confirmMatch);
 }
 
 // Avvia app
@@ -198,4 +200,120 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./service-worker.js')
             .catch(err => console.log('SW registration failed:', err));
     });
+}
+
+
+// Conferma formazione e crea match
+async function confirmMatch() {
+    if (!state.teams) return;
+
+    if (!confirm('Confermare questa formazione e aprire le votazioni?')) {
+        return;
+    }
+
+    try {
+        confirmMatchBtn.disabled = true;
+        confirmMatchBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Creazione...';
+
+        // Crea match
+        const matchData = {
+            team_a_score: generator.getTeamScore(state.teams.teamA).toFixed(1),
+            team_b_score: generator.getTeamScore(state.teams.teamB).toFixed(1),
+            balance_percentage: state.balance,
+            votazione_aperta: true
+        };
+
+        const matchResponse = await fetch(`${supabase.url}/rest/v1/matches`, {
+            method: 'POST',
+            headers: {
+                ...supabase.getAuthHeaders(),
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(matchData)
+        });
+
+        if (!matchResponse.ok) {
+            throw new Error('Errore nella creazione del match');
+        }
+
+        const matches = await matchResponse.json();
+        const matchId = matches[0].id;
+
+        // Salva giocatori squadra A
+        const teamAPlayers = state.teams.teamA.map(p => ({
+            match_id: matchId,
+            player_id: p.id,
+            team: 'A',
+            player_overall: p.overall
+        }));
+
+        // Salva giocatori squadra B
+        const teamBPlayers = state.teams.teamB.map(p => ({
+            match_id: matchId,
+            player_id: p.id,
+            team: 'B',
+            player_overall: p.overall
+        }));
+
+        await fetch(`${supabase.url}/rest/v1/match_players`, {
+            method: 'POST',
+            headers: supabase.getAuthHeaders(),
+            body: JSON.stringify([...teamAPlayers, ...teamBPlayers])
+        });
+
+        // Mostra link condivisibile
+        const matchUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}match.html?id=${matchId}`;
+        
+        showMatchLink(matchUrl);
+
+    } catch (error) {
+        console.error('Errore:', error);
+        alert('Errore nella creazione del match. Riprova.');
+        confirmMatchBtn.disabled = false;
+        confirmMatchBtn.innerHTML = '<i class="bi bi-check-circle"></i> Conferma Formazione';
+    }
+}
+
+// Mostra link match
+function showMatchLink(url) {
+    const actionsBar = document.querySelector('.actions-bar');
+    actionsBar.innerHTML = `
+        <div class="match-link-container">
+            <div class="alert alert-success mb-3">
+                <i class="bi bi-check-circle-fill"></i> Formazione confermata!
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Link per votare:</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" value="${url}" id="matchLinkInput" readonly>
+                    <button class="btn btn-primary" onclick="copyMatchLink()">
+                        <i class="bi bi-clipboard"></i> Copia
+                    </button>
+                </div>
+            </div>
+            <button class="btn btn-success w-100" onclick="shareMatchLink('${url}')">
+                <i class="bi bi-whatsapp"></i> Condividi su WhatsApp
+            </button>
+        </div>
+    `;
+}
+
+// Copia link
+function copyMatchLink() {
+    const input = document.getElementById('matchLinkInput');
+    input.select();
+    document.execCommand('copy');
+    
+    const btn = event.target.closest('button');
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check"></i> Copiato!';
+    setTimeout(() => {
+        btn.innerHTML = originalHtml;
+    }, 2000);
+}
+
+// Condividi su WhatsApp
+function shareMatchLink(url) {
+    const text = encodeURIComponent(`Vota la partita di calcetto! ${url}`);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
 }

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#C8F35A">
+    <title>Vota Partita - Calcetto Teams</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="loadingScreen" class="screen active">
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Caricamento partita...</p>
+        </div>
+    </div>
+
+    <div id="matchScreen" class="screen">
+        <header class="result-header">
+            <h2>Partita del <span id="matchDate"></span></h2>
+            <div id="matchStatus" class="match-status"></div>
+        </header>
+
+        <div class="teams-container">
+            <div class="row g-0">
+                <div class="col-6 team-column team-a">
+                    <div class="team-header">
+                        <h3>Squadra A</h3>
+                        <div class="team-score" id="teamAScore">0.0</div>
+                    </div>
+                    <div id="teamAPlayers" class="players-list-vote">
+                    </div>
+                </div>
+                <div class="col-6 team-column team-b">
+                    <div class="team-header">
+                        <h3>Squadra B</h3>
+                        <div class="team-score" id="teamBScore">0.0</div>
+                    </div>
+                    <div id="teamBPlayers" class="players-list-vote">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="voteActions" class="sticky-bottom">
+            <button id="submitVotesBtn" class="btn btn-primary btn-generate" disabled>
+                Invia Votazioni (<span id="votedCount">0</span>/10)
+            </button>
+        </div>
+
+        <div id="alreadyVoted" class="sticky-bottom" style="display: none;">
+            <div class="alert alert-info m-3">
+                Hai già votato per questa partita. Grazie!
+            </div>
+        </div>
+
+        <div id="votingClosed" class="sticky-bottom" style="display: none;">
+            <div class="alert alert-warning m-3">
+                La votazione per questa partita è chiusa.
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Voto Giocatore -->
+    <div class="modal fade" id="voteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Vota <span id="votePlayerName"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <label class="form-label">Stato di Forma</label>
+                        <div class="vote-scale">
+                            <div class="vote-buttons" id="formaButtons"></div>
+                        </div>
+                        <small class="text-muted">Condizione fisica generale</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prestazione</label>
+                        <div class="vote-scale">
+                            <div class="vote-buttons" id="prestazioneButtons"></div>
+                        </div>
+                        <small class="text-muted">Performance in questa partita</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-primary" id="saveVoteBtn" disabled>Conferma Voto</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/match.js"></script>
+</body>
+</html>

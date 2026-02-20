@@ -674,3 +674,170 @@ body {
     color: white;
     border-color: #2E5C8A;
 }
+
+/* Match voting styles */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 16px;
+}
+
+.match-status {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.players-list-vote {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+}
+
+.vote-player {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    transition: all 0.2s;
+}
+
+.team-b .vote-player {
+    background: rgba(0,0,0,0.05);
+}
+
+.vote-player.voted {
+    background: rgba(200, 243, 90, 0.3);
+}
+
+.team-b .vote-player.voted {
+    background: rgba(200, 243, 90, 0.2);
+}
+
+.vote-player-info {
+    flex: 1;
+}
+
+.btn-vote {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: transparent;
+    color: inherit;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-vote:hover {
+    transform: scale(1.1);
+    border-color: var(--primary-lime);
+}
+
+.btn-vote.btn-voted {
+    background: var(--primary-lime);
+    border-color: var(--primary-lime);
+    color: var(--text-dark);
+}
+
+/* Vote scale */
+.vote-scale {
+    margin: 12px 0;
+}
+
+.vote-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.vote-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: 2px solid #E0E0E0;
+    background: white;
+    color: var(--text-dark);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.vote-btn:hover {
+    border-color: var(--primary-lime);
+    transform: scale(1.05);
+}
+
+.vote-btn.selected {
+    background: var(--primary-lime);
+    border-color: var(--primary-lime);
+    transform: scale(1.1);
+}
+
+/* Responsive vote buttons */
+@media (max-width: 576px) {
+    .vote-buttons {
+        gap: 6px;
+    }
+    
+    .vote-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+    }
+}
+
+/* Match link container */
+.match-link-container {
+    padding: 20px;
+    background: white;
+}
+
+.match-link-container .form-label {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.match-link-container .input-group {
+    margin-bottom: 12px;
+}
+
+.match-link-container .form-control {
+    font-size: 13px;
+    font-family: monospace;
+}
+
+.btn-success {
+    background: var(--success);
+    border: none;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #27AE60;
+    color: white;
+}
+
+/* Actions bar con 3 bottoni */
+.actions-bar {
+    display: flex;
+    gap: 8px;
+}
+
+.actions-bar .btn {
+    flex: 1;
+    height: 56px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 12px;
+}
