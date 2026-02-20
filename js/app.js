@@ -226,7 +226,7 @@ async function confirmMatch() {
         const matchResponse = await fetch(`${supabase.url}/rest/v1/matches`, {
             method: 'POST',
             headers: {
-                ...supabase.getAuthHeaders(),
+                ...supabase.headers,
                 'Prefer': 'return=representation'
             },
             body: JSON.stringify(matchData)
@@ -257,7 +257,7 @@ async function confirmMatch() {
 
         await fetch(`${supabase.url}/rest/v1/match_players`, {
             method: 'POST',
-            headers: supabase.getAuthHeaders(),
+            headers: supabase.headers,
             body: JSON.stringify([...teamAPlayers, ...teamBPlayers])
         });
 
