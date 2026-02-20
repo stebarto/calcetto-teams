@@ -49,11 +49,14 @@ body {
 .app-header {
     background: linear-gradient(180deg, var(--sky-blue) 0%, #3a7bc8 100%);
     color: var(--white);
-    padding: 20px;
+
+    padding: calc(20px + env(safe-area-inset-top)) 20px 20px 20px;
+
     text-align: center;
     position: sticky;
     top: 0;
     z-index: 100;
+
     box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 8px 16px rgba(0,0,0,0.2);
     border-bottom: 4px solid var(--sunny-yellow);
 }
