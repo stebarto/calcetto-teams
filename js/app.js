@@ -204,10 +204,11 @@ if ('serviceWorker' in navigator) {
 
 
 // Conferma formazione e crea match
-async function confirmMatch() {
+async async function confirmMatch() {
     if (!state.teams) return;
 
-    if (!confirm('Confermare questa formazione e aprire le votazioni?')) {
+    const confirmed = await customConfirm('Confermare questa formazione e aprire le votazioni?');
+    if (!confirmed) {
         return;
     }
 
@@ -268,9 +269,9 @@ async function confirmMatch() {
 
     } catch (error) {
         console.error('Errore:', error);
-        alert('Errore nella creazione del match. Riprova.');
+        await customAlert('Errore nella creazione del match. Riprova.');
         confirmMatchBtn.disabled = false;
-        confirmMatchBtn.innerHTML = '<i class="bi bi-check-circle"></i> Conferma Formazione';
+        confirmMatchBtn.innerHTML = '<i class="bi bi-check-circle"></i> Conferma';
     }
 }
 
@@ -316,4 +317,53 @@ function copyMatchLink() {
 function shareMatchLink(url) {
     const text = encodeURIComponent(`Vota la partita di calcetto! ${url}`);
     window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+
+// Custom Alert e Confirm con Bootstrap Modal
+function customAlert(message) {
+    return new Promise((resolve) => {
+        const modal = new bootstrap.Modal(document.getElementById('customAlertModal'));
+        document.getElementById('customAlertMessage').textContent = message;
+        modal.show();
+        
+        const okBtn = document.querySelector('#customAlertModal .btn-primary');
+        const handleOk = () => {
+            modal.hide();
+            okBtn.removeEventListener('click', handleOk);
+            resolve();
+        };
+        okBtn.addEventListener('click', handleOk);
+    });
+}
+
+function customConfirm(message) {
+    return new Promise((resolve) => {
+        const modal = new bootstrap.Modal(document.getElementById('customConfirmModal'));
+        document.getElementById('customConfirmMessage').textContent = message;
+        modal.show();
+        
+        const okBtn = document.getElementById('customConfirmOk');
+        const cancelBtn = document.querySelector('#customConfirmModal .btn-secondary');
+        
+        const handleOk = () => {
+            modal.hide();
+            cleanup();
+            resolve(true);
+        };
+        
+        const handleCancel = () => {
+            modal.hide();
+            cleanup();
+            resolve(false);
+        };
+        
+        const cleanup = () => {
+            okBtn.removeEventListener('click', handleOk);
+            cancelBtn.removeEventListener('click', handleCancel);
+        };
+        
+        okBtn.addEventListener('click', handleOk);
+        cancelBtn.addEventListener('click', handleCancel);
+    });
 }

@@ -304,7 +304,7 @@ body {
 .result-header {
     background: linear-gradient(180deg, var(--sky-blue) 0%, #3a7bc8 100%);
     color: white;
-    padding: 20px 20px;
+    padding: max(20px, env(safe-area-inset-top)) 20px 20px 20px;
     text-align: center;
     border-bottom: 4px solid var(--sunny-yellow);
     box-shadow: 0 4px 16px rgba(0,0,0,0.3);
@@ -347,12 +347,14 @@ body {
 
 /* Container squadre */
 .teams-container {
-    min-height: calc(100vh - 200px);
+    min-height: calc(100vh - 160px);
+    display: flex;
 }
 
 .team-column {
     padding: 16px;
-    min-height: 400px;
+    min-height: calc(100vh - 160px);
+    flex: 1;
 }
 
 .team-a {
@@ -837,7 +839,183 @@ body {
 .actions-bar .btn {
     flex: 1;
     height: 56px;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 900;
+    border-radius: 8px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.actions-bar .btn i {
+    font-size: 18px;
+}
+
+.btn-success {
+    background: linear-gradient(180deg, var(--bright-green) 0%, #3D8B40 100%);
+    border: 3px solid #2E7D32;
+    color: white;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 rgba(0,0,0,0.3);
+}
+
+.btn-success:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+}
+
+
+/* Voting Modal Styles */
+.forma-btn {
+    flex: 1;
+    padding: 20px 10px;
+    border: 3px solid #E0E0E0;
     border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.forma-btn i {
+    font-size: 36px;
+}
+
+.forma-btn span {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.forma-btn[data-value="1"] i {
+    color: #E53935;
+}
+
+.forma-btn[data-value="2"] i {
+    color: #FF8C00;
+}
+
+.forma-btn[data-value="3"] i {
+    color: #4CAF50;
+}
+
+.forma-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.forma-btn.selected {
+    border-color: var(--sky-blue);
+    background: linear-gradient(180deg, var(--sky-blue) 0%, #3a7bc8 100%);
+    color: white;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+}
+
+.forma-btn.selected i {
+    color: white !important;
+}
+
+.star-btn {
+    flex: 1;
+    padding: 15px 5px;
+    border: 3px solid #E0E0E0;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.star-btn i {
+    font-size: 28px;
+    color: #E0E0E0;
+}
+
+.star-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.star-btn.selected {
+    border-color: var(--sunny-yellow);
+    background: linear-gradient(180deg, var(--sunny-yellow) 0%, #FFC700 100%);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+}
+
+.star-btn.selected i {
+    color: var(--orange);
+}
+
+/* Alert Modal Styles */
+.custom-alert-modal .modal-content {
+    border-radius: 16px;
+    border: 4px solid var(--sky-blue);
+    box-shadow: 0 8px 0 rgba(0,0,0,0.3), 0 12px 24px rgba(0,0,0,0.3);
+}
+
+.custom-alert-modal .modal-header {
+    background: linear-gradient(180deg, var(--sky-blue) 0%, #3a7bc8 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    border-bottom: none;
+}
+
+.custom-alert-modal .modal-title {
+    font-weight: 900;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+}
+
+.custom-alert-modal .modal-body {
+    padding: 30px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.custom-alert-modal .modal-footer {
+    border-top: none;
+    padding: 20px;
+    justify-content: center;
+}
+
+/* Confirm Modal Styles */
+.custom-confirm-modal .modal-content {
+    border-radius: 16px;
+    border: 4px solid var(--orange);
+    box-shadow: 0 8px 0 rgba(0,0,0,0.3), 0 12px 24px rgba(0,0,0,0.3);
+}
+
+.custom-confirm-modal .modal-header {
+    background: linear-gradient(180deg, var(--orange) 0%, #E67E00 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    border-bottom: none;
+}
+
+.custom-confirm-modal .modal-title {
+    font-weight: 900;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+}
+
+.custom-confirm-modal .modal-body {
+    padding: 30px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.custom-confirm-modal .modal-footer {
+    border-top: none;
+    padding: 20px;
+    gap: 10px;
 }

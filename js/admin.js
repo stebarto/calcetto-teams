@@ -153,13 +153,14 @@ const adminUI = {
             this.modal.hide();
             await this.loadManagePlayers();
         } catch (error) {
-            alert('Errore nel salvataggio del giocatore');
+            await customAlert('Errore nel salvataggio del giocatore');
             console.error(error);
         }
     },
 
     async deletePlayer(id) {
-        if (!confirm('Sei sicuro di voler eliminare questo giocatore?')) {
+        const confirmed = await customConfirm('Sei sicuro di voler eliminare questo giocatore?');
+        if (!confirmed) {
             return;
         }
 
@@ -167,7 +168,7 @@ const adminUI = {
             await supabase.deletePlayer(id);
             await this.loadManagePlayers();
         } catch (error) {
-            alert('Errore nella cancellazione del giocatore');
+            await customAlert('Errore nella cancellazione del giocatore');
             console.error(error);
         }
     }

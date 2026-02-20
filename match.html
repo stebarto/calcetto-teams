@@ -74,23 +74,67 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-4">
-                        <label class="form-label">Stato di Forma</label>
-                        <div class="vote-scale">
-                            <div class="vote-buttons" id="formaButtons"></div>
+                        <label class="form-label fw-bold">Stato di Forma</label>
+                        <div class="forma-vote-buttons d-flex justify-content-around gap-2 my-3">
+                            <button type="button" class="forma-btn" data-value="1" title="In Affanno">
+                                <i class="bi bi-emoji-frown"></i>
+                                <span>In Affanno</span>
+                            </button>
+                            <button type="button" class="forma-btn" data-value="2" title="Normale">
+                                <i class="bi bi-emoji-neutral"></i>
+                                <span>Normale</span>
+                            </button>
+                            <button type="button" class="forma-btn" data-value="3" title="Super Forma">
+                                <i class="bi bi-emoji-smile"></i>
+                                <span>Super Forma</span>
+                            </button>
                         </div>
                         <small class="text-muted">Condizione fisica generale</small>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Prestazione</label>
-                        <div class="vote-scale">
-                            <div class="vote-buttons" id="prestazioneButtons"></div>
+                        <label class="form-label fw-bold">Prestazione in Partita</label>
+                        <div class="prestazione-vote-buttons d-flex justify-content-between gap-2 my-3">
+                            <button type="button" class="star-btn" data-value="1">
+                                <i class="bi bi-star-fill"></i>
+                            </button>
+                            <button type="button" class="star-btn" data-value="2">
+                                <i class="bi bi-star-fill"></i>
+                            </button>
+                            <button type="button" class="star-btn" data-value="3">
+                                <i class="bi bi-star-fill"></i>
+                            </button>
+                            <button type="button" class="star-btn" data-value="4">
+                                <i class="bi bi-star-fill"></i>
+                            </button>
+                            <button type="button" class="star-btn" data-value="5">
+                                <i class="bi bi-star-fill"></i>
+                            </button>
                         </div>
-                        <small class="text-muted">Performance in questa partita</small>
+                        <small class="text-muted">Performance in questa partita (1-5 stelle)</small>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
                     <button type="button" class="btn btn-primary" id="saveVoteBtn" disabled>Conferma Voto</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div class="modal fade custom-alert-modal" id="customAlertModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-info-circle"></i> Attenzione
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="customAlertMessage">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
                 </div>
             </div>
         </div>

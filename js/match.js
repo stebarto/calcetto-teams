@@ -143,56 +143,79 @@ function openVoteModal(player) {
     matchState.currentVotingPlayer = player;
     document.getElementById('votePlayerName').textContent = player.nome;
     
-    createVoteButtons('formaButtons');
-    createVoteButtons('prestazioneButtons');
+    setupFormaButtons();
+    setupStarButtons();
     
     // Ripristina voti esistenti
     const existingVote = matchState.votes[player.id];
     if (existingVote) {
-        selectVoteButton('formaButtons', existingVote.forma);
-        selectVoteButton('prestazioneButtons', existingVote.prestazione);
+        selectFormaButton(existingVote.forma);
+        selectStarButtons(existingVote.prestazione);
     }
     
     new bootstrap.Modal(document.getElementById('voteModal')).show();
 }
 
-// Crea bottoni voto 1-10
-function createVoteButtons(containerId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
-    
-    for (let i = 1; i <= 10; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'vote-btn';
-        btn.textContent = i;
-        btn.dataset.value = i;
-        btn.addEventListener('click', () => {
-            container.querySelectorAll('.vote-btn').forEach(b => b.classList.remove('selected'));
+// Setup bottoni forma (3 opzioni con icone)
+function setupFormaButtons() {
+    const buttons = document.querySelectorAll('.forma-btn');
+    buttons.forEach(btn => {
+        btn.classList.remove('selected');
+        btn.onclick = () => {
+            buttons.forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             checkVoteComplete();
-        });
-        container.appendChild(btn);
-    }
+        };
+    });
 }
 
-// Seleziona bottone voto
-function selectVoteButton(containerId, value) {
-    const container = document.getElementById(containerId);
-    const btn = container.querySelector(`[data-value="${value}"]`);
+// Setup bottoni stelle (1-5)
+function setupStarButtons() {
+    const buttons = document.querySelectorAll('.star-btn');
+    buttons.forEach((btn, index) => {
+        btn.classList.remove('selected');
+        btn.onclick = () => {
+            const value = parseInt(btn.dataset.value);
+            buttons.forEach((b, i) => {
+                if (i < value) {
+                    b.classList.add('selected');
+                } else {
+                    b.classList.remove('selected');
+                }
+            });
+            checkVoteComplete();
+        };
+    });
+}
+
+// Seleziona bottone forma
+function selectFormaButton(value) {
+    const btn = document.querySelector(`.forma-btn[data-value="${value}"]`);
     if (btn) btn.classList.add('selected');
+}
+
+// Seleziona stelle
+function selectStarButtons(value) {
+    const buttons = document.querySelectorAll('.star-btn');
+    buttons.forEach((btn, index) => {
+        if (index < value) {
+            btn.classList.add('selected');
+        }
+    });
 }
 
 // Verifica voto completo
 function checkVoteComplete() {
-    const forma = document.querySelector('#formaButtons .vote-btn.selected');
-    const prestazione = document.querySelector('#prestazioneButtons .vote-btn.selected');
+    const forma = document.querySelector('.forma-btn.selected');
+    const prestazione = document.querySelector('.star-btn.selected');
     document.getElementById('saveVoteBtn').disabled = !(forma && prestazione);
 }
 
 // Salva voto singolo
 document.getElementById('saveVoteBtn').addEventListener('click', () => {
-    const forma = document.querySelector('#formaButtons .vote-btn.selected')?.dataset.value;
-    const prestazione = document.querySelector('#prestazioneButtons .vote-btn.selected')?.dataset.value;
+    const forma = document.querySelector('.forma-btn.selected')?.dataset.value;
+    const prestazioneButtons = document.querySelectorAll('.star-btn.selected');
+    const prestazione = prestazioneButtons.length;
     
     if (forma && prestazione) {
         matchState.votes[matchState.currentVotingPlayer.id] = {
@@ -215,7 +238,7 @@ function updateVoteCount() {
 // Invia tutte le votazioni
 document.getElementById('submitVotesBtn').addEventListener('click', async () => {
     if (Object.keys(matchState.votes).length !== 10) {
-        alert('Devi votare tutti i 10 giocatori');
+        await customAlert('Devi votare tutti i 10 giocatori');
         return;
     }
 
@@ -248,7 +271,7 @@ document.getElementById('submitVotesBtn').addEventListener('click', async () => 
         
     } catch (error) {
         console.error('Errore invio voti:', error);
-        alert('Errore nell\'invio dei voti. Riprova.');
+        await customAlert('Errore nell\'invio dei voti. Riprova.');
     }
 });
 
@@ -291,3 +314,21 @@ function getRoleLabel(ruolo) {
 
 // Avvia
 document.addEventListener('DOMContentLoaded', init);
+
+
+// Custom Alert con Bootstrap Modal
+function customAlert(message) {
+    return new Promise((resolve) => {
+        const modal = new bootstrap.Modal(document.getElementById('customAlertModal'));
+        document.getElementById('customAlertMessage').textContent = message;
+        modal.show();
+        
+        const okBtn = document.querySelector('#customAlertModal .btn-primary');
+        const handleOk = () => {
+            modal.hide();
+            okBtn.removeEventListener('click', handleOk);
+            resolve();
+        };
+        okBtn.addEventListener('click', handleOk);
+    });
+}

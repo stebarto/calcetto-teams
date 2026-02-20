@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kicksplit-v5';
+const CACHE_NAME = 'kicksplit-v7';
 const urlsToCache = [
   './',
   './index.html',
