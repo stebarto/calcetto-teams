@@ -17,7 +17,11 @@ const urlsToCache = [
     './assets/favicon_io/apple-touch-icon.png',
     './assets/votazioni/1.affanno.png',
     './assets/votazioni/2.neutro.png',
-    './assets/votazioni/3.in-forma.png'
+    './assets/votazioni/3.in-forma.png',
+    './assets/giocatori/barba.png',
+    './assets/giocatori/biondo.png',
+    './assets/giocatori/moro.png',
+    './assets/giocatori/pelato.png'
 ];
 
 // Installa service worker

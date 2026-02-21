@@ -68,9 +68,14 @@ function renderPlayersList() {
         const isSelected = state.selectedPlayers.includes(player.id);
         const isDisabled = !isSelected && state.selectedPlayers.length >= 10;
         
+        // Usa avatar dal database (barba, biondo, moro, pelato), o fallback casuale
+        const avatarTypes = ['barba', 'biondo', 'moro', 'pelato'];
+        const avatarType = player.avatar || avatarTypes[player.id % 4];
+        
         const item = document.createElement('div');
         item.className = `player-item ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`;
         item.innerHTML = `
+            <div class="player-avatar" data-avatar="${avatarType}"></div>
             <div class="player-info">
                 <div class="player-name">${player.nome}</div>
                 <span class="role-badge role-${player.ruolo.toLowerCase()}">${getRoleLabel(player.ruolo)}</span>
@@ -90,9 +95,9 @@ function renderPlayersList() {
 // Helper per label ruoli
 function getRoleLabel(ruolo) {
     const labels = {
-        'DIF': 'Difensore',
-        'CEN': 'Centrocampista',
-        'ATT': 'Attaccante',
+        'DIF': 'Dif',
+        'CEN': 'Cen',
+        'ATT': 'Att',
         'JOLLY': 'Jolly'
     };
     return labels[ruolo] || ruolo;
@@ -176,10 +181,8 @@ function renderTeamPlayers(containerId, team) {
         const div = document.createElement('div');
         div.className = 'result-player';
         div.innerHTML = `
-            <div class="result-player-name">
-                <span>${player.nome}</span>
-            </div>
-            <div class="result-player-role">${player.ruolo}</div>
+            <div class="result-player-name">${player.nome}</div>
+            <div class="result-player-role role-text-${player.ruolo.toLowerCase()}">${getRoleLabel(player.ruolo)}</div>
         `;
         container.appendChild(div);
     });

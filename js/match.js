@@ -121,15 +121,21 @@ function renderTeamPlayers(containerId, players) {
         const player = matchPlayer.giocatori;
         const hasVote = matchState.votes[player.id];
         
+        // Usa avatar dal database o fallback
+        const avatarTypes = ['barba', 'biondo', 'moro', 'pelato'];
+        const avatarType = player.avatar || avatarTypes[player.id % 4];
+        
         const div = document.createElement('div');
         div.className = `vote-player ${hasVote ? 'voted' : ''}`;
         div.innerHTML = `
+            <div class="vote-player-avatar" data-avatar="${avatarType}"></div>
             <div class="vote-player-info">
                 <div class="player-name">${player.nome}</div>
                 <span class="role-badge role-${player.ruolo.toLowerCase()}">${getRoleLabel(player.ruolo)}</span>
             </div>
             <button class="btn-vote ${hasVote ? 'btn-voted' : ''}" data-player-id="${player.id}">
-                <i class="bi ${hasVote ? 'bi-check-circle-fill' : 'bi-hand-thumbs-up'}"></i>
+                <i class="bi ${hasVote ? 'bi-check-circle-fill' : 'bi-star-fill'}"></i>
+                <span>${hasVote ? 'Votato' : 'Vota'}</span>
             </button>
         `;
 
@@ -308,7 +314,7 @@ function showError(message) {
 }
 
 function getRoleLabel(ruolo) {
-    const labels = { 'DIF': 'Difensore', 'CEN': 'Centrocampista', 'ATT': 'Attaccante', 'JOLLY': 'Jolly' };
+    const labels = { 'DIF': 'Dif', 'CEN': 'Cen', 'ATT': 'Att', 'JOLLY': 'Jolly' };
     return labels[ruolo] || ruolo;
 }
 

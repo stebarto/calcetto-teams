@@ -132,12 +132,44 @@ body {
     margin-bottom: 12px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 12px;
     cursor: pointer;
     transition: all 0.15s;
     min-height: 70px;
     box-shadow: 0 4px 0 rgba(0,0,0,0.3);
     color: #333;
+}
+
+.player-avatar {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 8px;
+    border: 2px solid #333;
+    flex-shrink: 0;
+}
+
+/* Avatar specifici per tipo */
+.player-avatar[data-avatar="barba"] { 
+    background-image: url('../assets/giocatori/barba.png'); 
+}
+.player-avatar[data-avatar="biondo"] { 
+    background-image: url('../assets/giocatori/biondo.png'); 
+}
+.player-avatar[data-avatar="moro"] { 
+    background-image: url('../assets/giocatori/moro.png'); 
+}
+.player-avatar[data-avatar="pelato"] { 
+    background-image: url('../assets/giocatori/pelato.png'); 
+}
+
+/* Fallback se non specificato */
+.player-avatar:not([data-avatar]) {
+    background-image: url('../assets/giocatori/moro.png');
 }
 
 .player-item:hover {
@@ -186,26 +218,30 @@ body {
 
 .player-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
 }
 
 .player-name {
     font-size: 18px;
     font-weight: 900;
-    margin-bottom: 4px;
     text-transform: uppercase;
+    line-height: 1;
 }
 
 /* Role badges */
 .role-badge {
     display: inline-block;
-    padding: 4px 10px;
+    padding: 3px 8px;
     border: 2px solid;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 900;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-top: 4px;
+    line-height: 1;
     box-shadow: 0 2px 0 rgba(0,0,0,0.2);
 }
 
@@ -357,6 +393,13 @@ body {
 .teams-container {
     min-height: calc(100vh - 160px);
     display: flex;
+    width: 100%;
+}
+
+.teams-container .row {
+    width: 100%;
+    margin: 0;
+    flex: 1;
 }
 
 .team-column {
@@ -372,7 +415,7 @@ body {
 }
 
 .team-b {
-    background: linear-gradient(180deg, #FF8C00 0%, #E67E00 100%);
+    background: linear-gradient(180deg, #4A90E2 0%, #3a7bc8 100%);
     color: white;
 }
 
@@ -404,34 +447,50 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding: 0 8px;
 }
 
 .result-player {
-    padding: 10px;
+    padding: 10px 12px;
     border-radius: 8px;
-    border: 2px solid rgba(255,255,255,0.3);
-    text-transform: uppercase;
-    background: rgba(0,0,0,0.2);
-    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
-    min-height: 55px;
+    background: white;
+    border: 2px solid rgba(0,0,0,0.2);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.15);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 2px;
 }
 
 .result-player-name {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 900;
-    margin-bottom: 3px;
-    line-height: 1.2;
-    word-wrap: break-word;
+    text-transform: uppercase;
+    line-height: 1;
+    color: #333;
 }
 
 .result-player-role {
     font-size: 10px;
-    opacity: 0.9;
-    text-transform: uppercase;
     font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+/* Ruoli colorati solo testo (senza label) per schermata risultato */
+.result-player .role-text-dif {
+    color: var(--sky-blue);
+}
+
+.result-player .role-text-cen {
+    color: var(--bright-green);
+}
+
+.result-player .role-text-att {
+    color: var(--red);
+}
+
+.result-player .role-text-jolly {
+    color: var(--orange);
 }
 
 /* Barra azioni */
@@ -722,63 +781,200 @@ body {
     font-weight: 600;
 }
 
-.players-list-vote {
+/* Layout verticale per votazione */
+.vote-teams-container {
+    padding: 16px;
+    padding-bottom: 100px;
+}
+
+.vote-team-section {
+    margin-bottom: 24px;
+}
+
+.vote-team-header {
+    padding: 12px 16px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 3px solid rgba(0,0,0,0.3);
+    border-bottom: none;
+}
+
+.vote-team-header h3 {
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: white;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+    margin: 0;
+}
+
+.vote-team-header .team-score {
+    font-size: 16px;
+    font-weight: 900;
+    color: white;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+}
+
+.team-a-bg {
+    background: linear-gradient(180deg, #E53935 0%, #C62828 100%);
+}
+
+.team-b-bg {
+    background: linear-gradient(180deg, #FF8C00 0%, #E67E00 100%);
+}
+
+.vote-players-list {
+    background: linear-gradient(180deg, #FFFFFF 0%, #E8E8E8 100%);
+    border: 3px solid rgba(0,0,0,0.3);
+    border-radius: 0 0 8px 8px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 20px;
+    gap: 8px;
 }
 
 .vote-player {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    justify-content: space-between;
-    padding: 12px;
+    gap: 12px;
+    padding: 10px 12px;
     border-radius: 8px;
-    background: rgba(255,255,255,0.1);
+    background: white;
+    border: 2px solid #ddd;
     transition: all 0.2s;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.1);
 }
 
-.team-b .vote-player {
-    background: rgba(0,0,0,0.05);
+.vote-player:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 0 rgba(0,0,0,0.15);
 }
 
 .vote-player.voted {
-    background: rgba(200, 243, 90, 0.3);
+    background: linear-gradient(180deg, #C8F35A 0%, #B8E34A 100%);
+    border-color: #A0D030;
 }
 
-.team-b .vote-player.voted {
-    background: rgba(200, 243, 90, 0.2);
+.vote-player-avatar {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 6px;
+    border: 2px solid #333;
+    flex-shrink: 0;
+}
+
+/* Avatar specifici per tipo */
+.vote-player-avatar[data-avatar="barba"] { 
+    background-image: url('../assets/giocatori/barba.png'); 
+}
+.vote-player-avatar[data-avatar="biondo"] { 
+    background-image: url('../assets/giocatori/biondo.png'); 
+}
+.vote-player-avatar[data-avatar="moro"] { 
+    background-image: url('../assets/giocatori/moro.png'); 
+}
+.vote-player-avatar[data-avatar="pelato"] { 
+    background-image: url('../assets/giocatori/pelato.png'); 
 }
 
 .vote-player-info {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.vote-player-info .player-name {
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1.2;
+    word-wrap: break-word;
+    color: #333;
+}
+
+.vote-player-info .role-badge {
+    align-self: flex-start;
 }
 
 .btn-vote {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.3);
-    background: transparent;
-    color: inherit;
-    font-size: 20px;
+    min-width: 60px;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 18px;
+    border: 2px solid #ddd;
+    background: white;
+    color: #666;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 4px;
     cursor: pointer;
     transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.btn-vote i {
+    font-size: 14px;
 }
 
 .btn-vote:hover {
-    transform: scale(1.1);
-    border-color: var(--primary-lime);
+    transform: translateY(-1px);
+    border-color: var(--sky-blue);
+    color: var(--sky-blue);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .btn-vote.btn-voted {
-    background: var(--primary-lime);
-    border-color: var(--primary-lime);
-    color: var(--text-dark);
+    background: var(--sky-blue);
+    border-color: var(--sky-blue);
+    color: white;
+}
+
+/* Ottimizzazione per iPhone standard */
+@media (max-width: 390px) {
+    .vote-players-list {
+        padding: 10px;
+        gap: 6px;
+    }
+    
+    .vote-player {
+        padding: 8px 10px;
+        gap: 10px;
+    }
+    
+    .vote-player-avatar {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+    }
+    
+    .vote-player-info .player-name {
+        font-size: 13px;
+    }
+    
+    .btn-vote {
+        min-width: 55px;
+        height: 32px;
+        font-size: 10px;
+        padding: 0 8px;
+    }
+    
+    .btn-vote i {
+        font-size: 12px;
+    }
 }
 
 /* Vote scale */
