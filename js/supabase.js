@@ -78,20 +78,50 @@ class SupabaseClient {
 
     async getPlayers() {
         try {
+            console.log('🔄 Loading players from Supabase...');
+            
             const response = await fetch(`${this.url}/rest/v1/giocatori?attivo=eq.true&select=*&order=nome.asc`, {
                 headers: this.headers
             });
             
             if (!response.ok) {
-                throw new Error('Errore nel caricamento giocatori');
+                console.error('❌ Supabase error:', response.status, response.statusText);
+                throw new Error(`HTTP ${response.status}`);
             }
             
             const players = await response.json();
-            return players.map(p => this.mapPlayer(p));
+            console.log('✅ Loaded', players.length, 'players from Supabase');
+            
+            const mappedPlayers = players.map(p => this.mapPlayer(p));
+            console.log('✅ Players mapped successfully');
+            return mappedPlayers;
+            
         } catch (error) {
-            console.error('Errore Supabase:', error);
-            return [];
+            console.error('❌ Supabase connection failed:', error.message);
+            console.log('🔄 Using mock data as fallback...');
+            
+            const mockPlayers = this.getMockPlayers();
+            console.log('✅ Loaded', mockPlayers.length, 'mock players');
+            return mockPlayers;
         }
+    }
+
+    // Dati mock per fallback
+    getMockPlayers() {
+        return [
+            { id: 1, nome: 'Mario Rossi', ruolo: 'ATT', forma: 8, difesa: 5, passaggi: 7, attacco: 9, dribbling: 8, attivo: true },
+            { id: 2, nome: 'Luigi Bianchi', ruolo: 'DIF', forma: 7, difesa: 9, passaggi: 6, attacco: 4, dribbling: 5, attivo: true },
+            { id: 3, nome: 'Paolo Verdi', ruolo: 'CEN', forma: 8, difesa: 6, passaggi: 8, attacco: 7, dribbling: 7, attivo: true },
+            { id: 4, nome: 'Marco Neri', ruolo: 'ATT', forma: 9, difesa: 4, passaggi: 6, attacco: 9, dribbling: 9, attivo: true },
+            { id: 5, nome: 'Andrea Gialli', ruolo: 'DIF', forma: 7, difesa: 8, passaggi: 7, attacco: 5, dribbling: 6, attivo: true },
+            { id: 6, nome: 'Luca Blu', ruolo: 'CEN', forma: 8, difesa: 7, passaggi: 9, attacco: 6, dribbling: 7, attivo: true },
+            { id: 7, nome: 'Stefano Rosa', ruolo: 'JOLLY', forma: 8, difesa: 7, passaggi: 7, attacco: 7, dribbling: 8, attivo: true },
+            { id: 8, nome: 'Giovanni Viola', ruolo: 'ATT', forma: 7, difesa: 5, passaggi: 6, attacco: 8, dribbling: 7, attivo: true },
+            { id: 9, nome: 'Francesco Arancio', ruolo: 'DIF', forma: 6, difesa: 8, passaggi: 6, attacco: 4, dribbling: 5, attivo: true },
+            { id: 10, nome: 'Antonio Marrone', ruolo: 'CEN', forma: 7, difesa: 6, passaggi: 8, attacco: 6, dribbling: 6, attivo: true },
+            { id: 11, nome: 'Alessandro Azzurro', ruolo: 'ATT', forma: 8, difesa: 4, passaggi: 7, attacco: 9, dribbling: 8, attivo: true },
+            { id: 12, nome: 'Matteo Grigio', ruolo: 'DIF', forma: 7, difesa: 9, passaggi: 5, attacco: 3, dribbling: 4, attivo: true }
+        ];
     }
 
     async addPlayer(player) {

@@ -75,17 +75,17 @@
                 <div class="modal-body">
                     <div class="mb-4">
                         <label class="form-label fw-bold">Stato di Forma</label>
-                        <div class="forma-vote-buttons d-flex justify-content-around gap-2 my-3">
-                            <button type="button" class="forma-btn" data-value="1" title="In Affanno">
-                                <i class="bi bi-emoji-frown"></i>
+                        <div class="forma-vote-buttons d-flex justify-content-around gap-3 my-3">
+                            <button type="button" class="forma-btn-img" data-value="1" title="In Affanno">
+                                <img src="assets/votazioni/1.affanno.png" alt="In Affanno">
                                 <span>In Affanno</span>
                             </button>
-                            <button type="button" class="forma-btn" data-value="2" title="Normale">
-                                <i class="bi bi-emoji-neutral"></i>
+                            <button type="button" class="forma-btn-img" data-value="2" title="Normale">
+                                <img src="assets/votazioni/2.neutro.png" alt="Normale">
                                 <span>Normale</span>
                             </button>
-                            <button type="button" class="forma-btn" data-value="3" title="Super Forma">
-                                <i class="bi bi-emoji-smile"></i>
+                            <button type="button" class="forma-btn-img" data-value="3" title="Super Forma">
+                                <img src="assets/votazioni/3.in-forma.png" alt="Super Forma">
                                 <span>Super Forma</span>
                             </button>
                         </div>
@@ -141,7 +141,13 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/supabase.js"></script>
-    <script src="js/match.js"></script>
+    
+    <!-- App JS con versioning automatico -->
+    <script>
+        // Versione dinamica per cache busting
+        const v = new Date().toISOString().slice(0,16).replace(/[-:T]/g,'');
+        document.write(`<script src="js/supabase.js?v=${v}"><\/script>`);
+        document.write(`<script src="js/match.js?v=${v}"><\/script>`);
+    </script>
 </body>
 </html>

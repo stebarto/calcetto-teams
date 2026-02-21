@@ -18,25 +18,53 @@ const confirmMatchBtn = document.getElementById('confirmMatchBtn');
 
 // Inizializzazione
 async function init() {
-    state.players = await supabase.getPlayers();
-    renderPlayersList();
-    updateTotalPlayers();
-    setupEventListeners();
+    console.log('🚀 Initializing KickSplit...');
+    try {
+        state.players = await supabase.getPlayers();
+        console.log('✅ Players loaded:', state.players.length);
+        
+        renderPlayersList();
+        updateTotalPlayers();
+        setupEventListeners();
+        
+        console.log('✅ KickSplit initialized successfully');
+    } catch (error) {
+        console.error('❌ Initialization failed:', error);
+        // Try to continue with empty state
+        state.players = [];
+        renderPlayersList();
+        updateTotalPlayers();
+        setupEventListeners();
+    }
 }
 
 // Aggiorna contatore totale giocatori
 function updateTotalPlayers() {
     const totalPlayersEl = document.getElementById('totalPlayers');
-    if (totalPlayersEl) {
+    if (totalPlayersEl && state.players) {
         totalPlayersEl.textContent = state.players.length;
+        console.log('✅ Total players updated:', state.players.length);
     }
 }
 
 // Render lista giocatori
 function renderPlayersList() {
+    console.log('🎨 Rendering players list...');
+    
+    if (!playersList) {
+        console.error('❌ playersList element not found!');
+        return;
+    }
+    
+    if (!state.players || state.players.length === 0) {
+        console.warn('⚠️ No players to render');
+        playersList.innerHTML = '<div class="text-center p-4">Nessun giocatore disponibile</div>';
+        return;
+    }
+    
     playersList.innerHTML = '';
     
-    state.players.forEach(player => {
+    state.players.forEach((player, index) => {
         const isSelected = state.selectedPlayers.includes(player.id);
         const isDisabled = !isSelected && state.selectedPlayers.length >= 10;
         
@@ -55,6 +83,8 @@ function renderPlayersList() {
         
         playersList.appendChild(item);
     });
+    
+    console.log('✅ Rendered', state.players.length, 'players');
 }
 
 // Helper per label ruoli
@@ -192,6 +222,36 @@ function setupEventListeners() {
 document.addEventListener('DOMContentLoaded', () => {
     init();
     adminUI.init();
+    
+    // Aggiungi test automatici in development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.log('🧪 Development mode: Test automatici disponibili');
+        console.log('Per eseguire i test: apri tests/test-runner.html');
+        
+        // Aggiungi shortcut per test rapidi
+        window.runQuickTests = async () => {
+            console.log('🚀 Esecuzione test rapidi...');
+            
+            // Test connessione Supabase
+            try {
+                const players = await supabase.getPlayers();
+                console.log('✅ Supabase OK:', players.length, 'giocatori');
+            } catch (error) {
+                console.error('❌ Supabase Error:', error.message);
+            }
+            
+            // Test generator
+            try {
+                const mockPlayers = supabase.getMockPlayers();
+                const result = generator.generateTeams(mockPlayers);
+                console.log('✅ Generator OK: Balance', result.balance + '%');
+            } catch (error) {
+                console.error('❌ Generator Error:', error.message);
+            }
+        };
+        
+        console.log('💡 Tip: Esegui window.runQuickTests() per test rapidi');
+    }
 });
 
 // Service Worker per PWA
@@ -204,7 +264,7 @@ if ('serviceWorker' in navigator) {
 
 
 // Conferma formazione e crea match
-async async function confirmMatch() {
+async function confirmMatch() {
     if (!state.teams) return;
 
     const confirmed = await customConfirm('Confermare questa formazione e aprire le votazioni?');
@@ -218,11 +278,13 @@ async async function confirmMatch() {
 
         // Crea match
         const matchData = {
-            team_a_score: generator.getTeamScore(state.teams.teamA).toFixed(1),
-            team_b_score: generator.getTeamScore(state.teams.teamB).toFixed(1),
-            balance_percentage: state.balance,
+            team_a_score: parseFloat(generator.getTeamScore(state.teams.teamA).toFixed(1)),
+            team_b_score: parseFloat(generator.getTeamScore(state.teams.teamB).toFixed(1)),
+            balance_percentage: parseInt(state.balance),
             votazione_aperta: true
         };
+
+        console.log('📤 Sending match data:', matchData);
 
         const matchResponse = await fetch(`${supabase.url}/rest/v1/matches`, {
             method: 'POST',
@@ -233,11 +295,16 @@ async async function confirmMatch() {
             body: JSON.stringify(matchData)
         });
 
+        console.log('📥 Match response status:', matchResponse.status);
+
         if (!matchResponse.ok) {
-            throw new Error('Errore nella creazione del match');
+            const errorText = await matchResponse.text();
+            console.error('❌ Match creation error response:', errorText);
+            throw new Error('Errore nella creazione del match: ' + errorText);
         }
 
         const matches = await matchResponse.json();
+        console.log('✅ Match created:', matches);
         const matchId = matches[0].id;
 
         // Salva giocatori squadra A
@@ -245,7 +312,7 @@ async async function confirmMatch() {
             match_id: matchId,
             player_id: p.id,
             team: 'A',
-            player_overall: p.overall
+            player_overall: parseFloat(generator.calculateOverall(p).toFixed(1))
         }));
 
         // Salva giocatori squadra B
@@ -253,14 +320,24 @@ async async function confirmMatch() {
             match_id: matchId,
             player_id: p.id,
             team: 'B',
-            player_overall: p.overall
+            player_overall: parseFloat(generator.calculateOverall(p).toFixed(1))
         }));
 
-        await fetch(`${supabase.url}/rest/v1/match_players`, {
+        console.log('📤 Sending players data:', [...teamAPlayers, ...teamBPlayers]);
+
+        const playersResponse = await fetch(`${supabase.url}/rest/v1/match_players`, {
             method: 'POST',
             headers: supabase.headers,
             body: JSON.stringify([...teamAPlayers, ...teamBPlayers])
         });
+
+        if (!playersResponse.ok) {
+            const errorText = await playersResponse.text();
+            console.error('❌ Players save error:', errorText);
+            throw new Error('Errore nel salvataggio giocatori: ' + errorText);
+        }
+
+        console.log('✅ Players saved successfully');
 
         // Mostra link condivisibile
         const matchUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}match.html?id=${matchId}`;
@@ -268,8 +345,8 @@ async async function confirmMatch() {
         showMatchLink(matchUrl);
 
     } catch (error) {
-        console.error('Errore:', error);
-        await customAlert('Errore nella creazione del match. Riprova.');
+        console.error('❌ Errore completo:', error);
+        await customAlert('Errore nella creazione del match. Controlla la console per dettagli.');
         confirmMatchBtn.disabled = false;
         confirmMatchBtn.innerHTML = '<i class="bi bi-check-circle"></i> Conferma';
     }

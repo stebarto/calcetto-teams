@@ -156,9 +156,9 @@ function openVoteModal(player) {
     new bootstrap.Modal(document.getElementById('voteModal')).show();
 }
 
-// Setup bottoni forma (3 opzioni con icone)
+// Setup bottoni forma (3 opzioni con immagini)
 function setupFormaButtons() {
-    const buttons = document.querySelectorAll('.forma-btn');
+    const buttons = document.querySelectorAll('.forma-btn-img');
     buttons.forEach(btn => {
         btn.classList.remove('selected');
         btn.onclick = () => {
@@ -190,7 +190,7 @@ function setupStarButtons() {
 
 // Seleziona bottone forma
 function selectFormaButton(value) {
-    const btn = document.querySelector(`.forma-btn[data-value="${value}"]`);
+    const btn = document.querySelector(`.forma-btn-img[data-value="${value}"]`);
     if (btn) btn.classList.add('selected');
 }
 
@@ -206,14 +206,14 @@ function selectStarButtons(value) {
 
 // Verifica voto completo
 function checkVoteComplete() {
-    const forma = document.querySelector('.forma-btn.selected');
+    const forma = document.querySelector('.forma-btn-img.selected');
     const prestazione = document.querySelector('.star-btn.selected');
     document.getElementById('saveVoteBtn').disabled = !(forma && prestazione);
 }
 
 // Salva voto singolo
 document.getElementById('saveVoteBtn').addEventListener('click', () => {
-    const forma = document.querySelector('.forma-btn.selected')?.dataset.value;
+    const forma = document.querySelector('.forma-btn-img.selected')?.dataset.value;
     const prestazioneButtons = document.querySelectorAll('.star-btn.selected');
     const prestazione = prestazioneButtons.length;
     

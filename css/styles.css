@@ -7,7 +7,15 @@
 
 body {
     font-family: 'Arial Black', 'Arial Bold', Arial, sans-serif;
-    background: #3D7F3F;
+    background: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 19px,
+            rgba(255,255,255,0.05) 19px,
+            rgba(255,255,255,0.05) 20px
+        ),
+        linear-gradient(180deg, #3D7F3F 0%, #2a5a2c 100%);
     color: #FFFFFF;
     overflow-x: hidden;
 }
@@ -29,16 +37,8 @@ body {
 .screen {
     display: none;
     min-height: 100vh;
+    width: 100%;
     padding-bottom: 100px;
-    background: 
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 19px,
-            rgba(255,255,255,0.05) 19px,
-            rgba(255,255,255,0.05) 20px
-        ),
-        linear-gradient(180deg, #3D7F3F 0%, #2a5a2c 100%);
 }
 
 .screen.active {
@@ -239,10 +239,18 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
+    width: 100%;
     padding: 16px;
     background: linear-gradient(180deg, #1a3a1d 0%, #0d1f0e 100%);
     box-shadow: 0 -4px 16px rgba(0,0,0,0.5);
     border-top: 3px solid var(--sunny-yellow);
+    display: flex;
+    justify-content: center;
+}
+
+.sticky-bottom > * {
+    width: 100%;
+    max-width: 800px;
 }
 
 .btn-generate {
@@ -463,6 +471,17 @@ body {
         max-width: 600px;
         margin: 0 auto;
     }
+    
+    /* Su desktop le colonne delle squadre riempiono tutto lo spazio */
+    .teams-container {
+        width: 100%;
+        max-width: none;
+    }
+    
+    .teams-container .row {
+        width: 100%;
+        max-width: none;
+    }
 }
 
 /* Nascondi admin button quando non nella schermata principale */
@@ -619,6 +638,17 @@ body {
 
 .modal-body {
     padding: 24px;
+    color: #333 !important;
+}
+
+.modal-body p,
+.modal-body div,
+.modal-body span {
+    color: #333 !important;
+}
+
+.modal-footer {
+    background: transparent;
 }
 
 .form-label {
@@ -803,11 +833,18 @@ body {
 .match-link-container {
     padding: 20px;
     background: white;
+    color: #333 !important;
+}
+
+.match-link-container * {
+    color: #333 !important;
 }
 
 .match-link-container .form-label {
     font-size: 14px;
     margin-bottom: 8px;
+    color: #333 !important;
+    font-weight: 700;
 }
 
 .match-link-container .input-group {
@@ -817,6 +854,23 @@ body {
 .match-link-container .form-control {
     font-size: 13px;
     font-family: monospace;
+    color: #333 !important;
+    background: white;
+}
+
+.match-link-container .alert {
+    color: white !important;
+}
+
+.match-link-container .alert * {
+    color: white !important;
+}
+
+.match-link-container p,
+.match-link-container div,
+.match-link-container span,
+.match-link-container label {
+    color: #333 !important;
 }
 
 .btn-success {
@@ -925,6 +979,56 @@ body {
     color: white !important;
 }
 
+/* Forma buttons with images */
+.forma-btn-img {
+    flex: 1;
+    padding: 15px 10px;
+    border: 3px solid #E0E0E0;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.forma-btn-img img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    transition: all 0.2s;
+}
+
+.forma-btn-img span {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #333;
+    text-align: center;
+}
+
+.forma-btn-img:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    border-color: var(--sky-blue);
+}
+
+.forma-btn-img.selected {
+    border-color: var(--sky-blue);
+    background: linear-gradient(180deg, var(--sky-blue) 0%, #3a7bc8 100%);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+}
+
+.forma-btn-img.selected span {
+    color: white;
+}
+
+.forma-btn-img.selected img {
+    filter: brightness(0) invert(1);
+}
+
 .star-btn {
     flex: 1;
     padding: 15px 5px;
@@ -981,6 +1085,12 @@ body {
     padding: 30px;
     font-size: 16px;
     text-align: center;
+    color: #333 !important;
+    font-weight: 700;
+}
+
+.custom-alert-modal .modal-body * {
+    color: #333 !important;
 }
 
 .custom-alert-modal .modal-footer {
@@ -1012,6 +1122,12 @@ body {
     padding: 30px;
     font-size: 16px;
     text-align: center;
+    color: #333 !important;
+    font-weight: 700;
+}
+
+.custom-confirm-modal .modal-body * {
+    color: #333 !important;
 }
 
 .custom-confirm-modal .modal-footer {

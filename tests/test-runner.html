@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KickSplit - Test Runner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .test-result { margin: 5px 0; padding: 10px; border-radius: 5px; }
+        .test-passed { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .test-failed { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .console-output { background: #000; color: #0f0; font-family: monospace; padding: 15px; border-radius: 5px; max-height: 400px; overflow-y: auto; }
+        .stats { font-size: 1.2em; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">🧪 KickSplit Test Suite</h1>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Test Controls</h5>
+                    </div>
+                    <div class="card-body">
+                        <button id="runAllTests" class="btn btn-primary me-2">🚀 Esegui Tutti i Test</button>
+                        <button id="runSupabaseTests" class="btn btn-info me-2">🗄️ Test Supabase</button>
+                        <button id="runGeneratorTests" class="btn btn-success me-2">⚽ Test Generator</button>
+                        <button id="clearResults" class="btn btn-secondary">🗑️ Pulisci Risultati</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>📊 Risultati Test</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="testStats" class="stats mb-3">
+                                    Nessun test eseguito
+                                </div>
+                                <div id="testResults">
+                                    <!-- Risultati test qui -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>💻 Console Output</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="consoleOutput" class="console-output">
+                                    Pronto per eseguire i test...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- App Scripts -->
+    <script src="../js/supabase.js"></script>
+    <script src="../js/generator.js"></script>
+    
+    <!-- Test Scripts -->
+    <script src="supabase.test.js"></script>
+    <script src="generator.test.js"></script>
+    
+    <script>
+        class TestRunner {
+            constructor() {
+                this.allResults = [];
+                this.setupConsoleCapture();
+                this.setupEventListeners();
+            }
+
+            setupConsoleCapture() {
+                const consoleOutput = document.getElementById('consoleOutput');
+                const originalLog = console.log;
+                const originalError = console.error;
+                const originalWarn = console.warn;
+
+                console.log = (...args) => {
+                    originalLog.apply(console, args);
+                    this.addToConsole(args.join(' '), 'log');
+                };
+
+                console.error = (...args) => {
+                    originalError.apply(console, args);
+                    this.addToConsole(args.join(' '), 'error');
+                };
+
+                console.warn = (...args) => {
+                    originalWarn.apply(console, args);
+                    this.addToConsole(args.join(' '), 'warn');
+                };
+            }
+
+            addToConsole(message, type = 'log') {
+                const consoleOutput = document.getElementById('consoleOutput');
+                const timestamp = new Date().toLocaleTimeString();
+                const color = type === 'error' ? '#ff6b6b' : type === 'warn' ? '#ffd93d' : '#0f0';
+                
+                consoleOutput.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            }
+
+            setupEventListeners() {
+                document.getElementById('runAllTests').addEventListener('click', () => this.runAllTests());
+                document.getElementById('runSupabaseTests').addEventListener('click', () => this.runSupabaseTests());
+                document.getElementById('runGeneratorTests').addEventListener('click', () => this.runGeneratorTests());
+                document.getElementById('clearResults').addEventListener('click', () => this.clearResults());
+            }
+
+            async runAllTests() {
+                this.clearResults();
+                console.log('🚀 Avvio suite completa di test...');
+                
+                await this.runSupabaseTests();
+                await this.runGeneratorTests();
+                
+                this.updateOverallStats();
+                console.log('✅ Suite di test completata!');
+            }
+
+            async runSupabaseTests() {
+                console.log('\n🗄️ === TEST SUPABASE ===');
+                const supabaseTests = new SupabaseTests();
+                const results = await supabaseTests.runAllTests();
+                this.allResults.push(...results);
+                this.updateResults();
+            }
+
+            async runGeneratorTests() {
+                console.log('\n⚽ === TEST GENERATOR ===');
+                const generatorTests = new GeneratorTests();
+                const results = await generatorTests.runAllTests();
+                this.allResults.push(...results);
+                this.updateResults();
+            }
+
+            updateResults() {
+                const resultsDiv = document.getElementById('testResults');
+                resultsDiv.innerHTML = '';
+
+                this.allResults.forEach(result => {
+                    const div = document.createElement('div');
+                    div.className = `test-result ${result.passed ? 'test-passed' : 'test-failed'}`;
+                    div.innerHTML = `
+                        <strong>${result.test}</strong><br>
+                        <small>${result.message}</small>
+                    `;
+                    resultsDiv.appendChild(div);
+                });
+
+                this.updateStats();
+            }
+
+            updateStats() {
+                const passed = this.allResults.filter(r => r.passed).length;
+                const total = this.allResults.length;
+                const percentage = total > 0 ? Math.round((passed / total) * 100) : 0;
+                
+                const statsDiv = document.getElementById('testStats');
+                const color = percentage === 100 ? 'text-success' : percentage >= 80 ? 'text-warning' : 'text-danger';
+                
+                statsDiv.innerHTML = `
+                    <span class="${color}">
+                        ${passed}/${total} test passati (${percentage}%)
+                    </span>
+                `;
+            }
+
+            updateOverallStats() {
+                const passed = this.allResults.filter(r => r.passed).length;
+                const total = this.allResults.length;
+                
+                if (passed === total) {
+                    console.log(`🎉 SUCCESSO: Tutti i ${total} test sono passati!`);
+                } else {
+                    console.warn(`⚠️ ATTENZIONE: ${total - passed} test su ${total} sono falliti.`);
+                }
+            }
+
+            clearResults() {
+                this.allResults = [];
+                document.getElementById('testResults').innerHTML = '';
+                document.getElementById('testStats').innerHTML = 'Nessun test eseguito';
+                document.getElementById('consoleOutput').innerHTML = 'Console pulita...';
+            }
+        }
+
+        // Inizializza test runner
+        const testRunner = new TestRunner();
+        
+        // Auto-run test on load (opzionale)
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Test Runner caricato. Pronto per eseguire i test.');
+        });
+    </script>
+</body>
+</html>
