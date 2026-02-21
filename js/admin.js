@@ -117,6 +117,7 @@ const adminUI = {
         document.getElementById('playerId').value = player.id;
         document.getElementById('playerName').value = player.nome;
         document.getElementById('playerRole').value = player.ruolo;
+        document.getElementById('playerAvatar').value = player.avatar || 'moro';
         document.getElementById('playerForma').value = player.forma;
         document.getElementById('playerDifesa').value = player.difesa;
         document.getElementById('playerPassaggi').value = player.passaggi;
@@ -135,6 +136,7 @@ const adminUI = {
         const playerData = {
             nome: document.getElementById('playerName').value,
             ruolo: document.getElementById('playerRole').value,
+            avatar: document.getElementById('playerAvatar').value,
             forma: parseInt(document.getElementById('playerForma').value),
             difesa: parseInt(document.getElementById('playerDifesa').value),
             passaggi: parseInt(document.getElementById('playerPassaggi').value),

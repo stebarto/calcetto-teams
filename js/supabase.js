@@ -139,6 +139,7 @@ class SupabaseClient {
                 attacco: player.attacco,
                 dribbling: player.dribbling,
                 ruolo: player.ruolo,
+                avatar: player.avatar,
                 attivo: true
             })
         });
@@ -165,7 +166,8 @@ class SupabaseClient {
                 passaggi: player.passaggi,
                 attacco: player.attacco,
                 dribbling: player.dribbling,
-                ruolo: player.ruolo
+                ruolo: player.ruolo,
+                avatar: player.avatar
             })
         });
         
@@ -199,6 +201,7 @@ class SupabaseClient {
             attacco: dbPlayer.attacco,
             dribbling: dbPlayer.dribbling,
             ruolo: dbPlayer.ruolo,
+            avatar: dbPlayer.avatar,
             attivo: dbPlayer.attivo
         };
     }

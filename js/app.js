@@ -141,6 +141,9 @@ function showResultScreen() {
     renderTeams();
     selectionScreen.classList.remove('active');
     resultScreen.classList.add('active');
+    
+    // Scroll automatico in alto per vedere l'equilibrio
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Render squadre
