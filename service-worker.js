@@ -70,32 +70,34 @@ self.addEventListener('fetch', event => {
         return;
     }
 
+    // STRATEGIA NETWORK FIRST: prova sempre la rete prima, cache solo come fallback
     event.respondWith(
-        caches.match(event.request)
+        fetch(event.request)
             .then(response => {
-                // Restituisci dalla cache se disponibile
-                if (response) {
-                    console.log('📦 Service Worker: Serving from cache:', event.request.url);
-                    return response;
-                }
-
-                // Altrimenti fetch dalla rete
-                console.log('🌐 Service Worker: Fetching from network:', event.request.url);
-                return fetch(event.request).then(response => {
-                    // Non cachare se la risposta non è valida
-                    if (!response || response.status !== 200 || response.type !== 'basic') {
-                        return response;
-                    }
-
-                    // Clona la risposta per la cache
+                // Se la risposta è valida, aggiorna la cache
+                if (response && response.status === 200 && response.type === 'basic') {
                     const responseToCache = response.clone();
                     caches.open(CACHE_NAME)
                         .then(cache => {
                             cache.put(event.request, responseToCache);
                         });
-
-                    return response;
-                });
+                }
+                return response;
+            })
+            .catch(() => {
+                // Solo se la rete fallisce, usa la cache
+                return caches.match(event.request)
+                    .then(response => {
+                        if (response) {
+                            console.log('📦 Service Worker: Serving from cache (offline):', event.request.url);
+                            return response;
+                        }
+                        // Se non c'è nemmeno in cache, fallisce
+                        return new Response('Offline - contenuto non disponibile', {
+                            status: 503,
+                            statusText: 'Service Unavailable'
+                        });
+                    });
             })
     );
 });
