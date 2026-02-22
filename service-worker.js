@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kicksplit-v' + new Date().toISOString().slice(0,10).replace(/-/g,'');
+const CACHE_NAME = 'kicksplit-v20260222-avatar';
 const urlsToCache = [
     './',
     './index.html',
