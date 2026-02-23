@@ -1553,6 +1553,54 @@ body {
 }
 
 
+/* Player Stats Popup */
+.player-stats-popup {
+    padding: 16px;
+    text-align: left;
+}
+
+.player-stats-popup .stat-card-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #ddd;
+}
+
+.player-stats-popup .stat-grid {
+    margin-bottom: 16px;
+}
+
+.stat-history {
+    margin-top: 16px;
+}
+
+.stat-history-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    border: 2px solid #e0e0e0;
+    font-size: 13px;
+    color: #333;
+}
+
+.stat-history-item strong {
+    font-weight: 900;
+}
+
+.stat-history-item .good {
+    color: var(--bright-green);
+}
+
+.stat-history-item .average {
+    color: var(--orange);
+}
+
+.stat-history-item .poor {
+    color: var(--red);
+}
+
 /* Voting Modal Styles */
 .forma-btn {
     flex: 1;

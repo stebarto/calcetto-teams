@@ -163,7 +163,7 @@ const adminUI = {
         this.modal.show();
     },
 
-    editPlayer(player) {
+    async editPlayer(player) {
         this.currentPlayer = player;
         document.getElementById('modalTitle').textContent = 'Modifica Giocatore';
         document.getElementById('playerId').value = player.id;
@@ -179,7 +179,98 @@ const adminUI = {
         document.getElementById('playerPassaggi').value = player.passaggi;
         document.getElementById('playerAttacco').value = player.attacco;
         document.getElementById('playerDribbling').value = player.dribbling;
+        
+        // Carica suggerimenti basati su voti recenti
+        await this.loadPlayerSuggestions(player);
+        
         this.modal.show();
+    },
+    
+    async loadPlayerSuggestions(player) {
+        const suggestionsBox = document.getElementById('playerSuggestions');
+        const suggestionsContent = document.getElementById('suggestionsContent');
+        
+        try {
+            // Carica ultimi 5-10 voti del giocatore
+            const response = await fetch(
+                `${supabase.url}/rest/v1/match_votes?player_id=eq.${player.id}&select=*&order=created_at.desc&limit=10`,
+                { headers: supabase.headers }
+            );
+            
+            const votes = await response.json();
+            
+            if (!votes || votes.length === 0) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+            
+            // Calcola medie recenti (ultime 5 partite)
+            const recentVotes = votes.slice(0, 5);
+            let formaSum = 0;
+            let prestazioneSum = 0;
+            
+            recentVotes.forEach(vote => {
+                formaSum += vote.voto_forma;
+                prestazioneSum += vote.voto_prestazione;
+            });
+            
+            const avgForma = formaSum / recentVotes.length;
+            const avgPrestazione = prestazioneSum / recentVotes.length;
+            
+            // Calcola suggerimenti
+            // Forma: media tra valore attuale e media voti * 3 (per scalare da 1-3 a 1-10)
+            const suggestedForma = Math.round((player.forma + avgForma * 3) / 2);
+            const clampedForma = Math.max(1, Math.min(10, suggestedForma));
+            
+            // Salva suggerimenti per applySuggestions
+            this.currentSuggestions = {
+                forma: clampedForma
+            };
+            
+            // Mostra suggerimenti
+            const formaClass = avgForma >= 2.5 ? 'good' : avgForma >= 2 ? 'average' : 'poor';
+            const prestazioneClass = avgPrestazione >= 4 ? 'good' : avgPrestazione >= 3 ? 'average' : 'poor';
+            
+            suggestionsContent.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+                    <div style="background: white; padding: 8px; border-radius: 6px; border: 2px solid #ddd;">
+                        <div style="font-size: 10px; color: #666; font-weight: 700;">MEDIA FORMA (ultime ${recentVotes.length})</div>
+                        <div style="font-size: 18px; font-weight: 900;" class="${formaClass}">${avgForma.toFixed(1)}/3</div>
+                    </div>
+                    <div style="background: white; padding: 8px; border-radius: 6px; border: 2px solid #ddd;">
+                        <div style="font-size: 10px; color: #666; font-weight: 700;">MEDIA PRESTAZIONE</div>
+                        <div style="font-size: 18px; font-weight: 900;" class="${prestazioneClass}">${avgPrestazione.toFixed(1)}/5</div>
+                    </div>
+                </div>
+                <div style="margin-top: 12px; padding: 10px; background: white; border-radius: 6px; border: 2px solid #4CAF50;">
+                    <div style="font-size: 11px; color: #666; font-weight: 700; margin-bottom: 4px;">FORMA SUGGERITA</div>
+                    <div style="font-size: 24px; font-weight: 900; color: #4CAF50;">${clampedForma}/10</div>
+                    <div style="font-size: 10px; color: #666; margin-top: 4px;">Attuale: ${player.forma}/10</div>
+                </div>
+            `;
+            
+            suggestionsBox.style.display = 'block';
+            
+        } catch (error) {
+            console.error('Errore caricamento suggerimenti:', error);
+            suggestionsBox.style.display = 'none';
+        }
+    },
+    
+    applySuggestions() {
+        if (!this.currentSuggestions) return;
+        
+        // Applica i suggerimenti ai campi del form
+        if (this.currentSuggestions.forma) {
+            document.getElementById('playerForma').value = this.currentSuggestions.forma;
+        }
+        
+        // Feedback visivo
+        const formaInput = document.getElementById('playerForma');
+        formaInput.style.background = '#C8F35A';
+        setTimeout(() => {
+            formaInput.style.background = 'white';
+        }, 500);
     },
 
     async savePlayer() {
@@ -231,8 +322,87 @@ const adminUI = {
         }
     },
     
-    async loadPlayerStats() {
-        const container = document.getElementById('playerStats');
+    async showPlayerStats(player) {
+        try {
+            // Carica voti del giocatore
+            const response = await fetch(
+                `${supabase.url}/rest/v1/match_votes?player_id=eq.${player.id}&select=*,matches(data_partita)&order=matches(data_partita).desc&limit=10`,
+                { headers: supabase.headers }
+            );
+            
+            const votes = await response.json();
+            
+            if (!votes || votes.length === 0) {
+                await customAlert(`
+                    <div class="no-stats">
+                        <i class="bi bi-graph-up"></i>
+                        <p><strong>${player.nome}</strong></p>
+                        <p>Nessuna statistica disponibile.<br>Le statistiche appariranno dopo le prime votazioni.</p>
+                    </div>
+                `);
+                return;
+            }
+            
+            // Calcola statistiche
+            let formaSum = 0;
+            let prestazioneSum = 0;
+            votes.forEach(vote => {
+                formaSum += vote.voto_forma;
+                prestazioneSum += vote.voto_prestazione;
+            });
+            
+            const avgForma = (formaSum / votes.length).toFixed(1);
+            const avgPrestazione = (prestazioneSum / votes.length).toFixed(1);
+            const formaClass = avgForma >= 2.5 ? 'good' : avgForma >= 2 ? 'average' : 'poor';
+            const prestazioneClass = avgPrestazione >= 4 ? 'good' : avgPrestazione >= 3 ? 'average' : 'poor';
+            
+            // Crea HTML per il popup
+            const statsHtml = `
+                <div class="player-stats-popup">
+                    <div class="stat-card-header">
+                        <div class="stat-player-name">${player.nome}</div>
+                        <div class="stat-matches">${votes.length} partite</div>
+                    </div>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Media Forma</div>
+                            <div class="stat-value ${formaClass}">${avgForma}/3</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Media Prestazione</div>
+                            <div class="stat-value ${prestazioneClass}">${avgPrestazione}/5</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Forma Attuale</div>
+                            <div class="stat-value">${player.forma}/10</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Partite Totali</div>
+                            <div class="stat-value">${votes.length}</div>
+                        </div>
+                    </div>
+                    <div class="stat-history">
+                        <div class="stat-label" style="margin-bottom: 8px;">Ultime Partite</div>
+                        ${votes.slice(0, 5).map(vote => `
+                            <div class="stat-history-item">
+                                <span>Forma: <strong class="${vote.voto_forma >= 2.5 ? 'good' : vote.voto_forma >= 2 ? 'average' : 'poor'}">${vote.voto_forma}/3</strong></span>
+                                <span>Prestazione: <strong class="${vote.voto_prestazione >= 4 ? 'good' : vote.voto_prestazione >= 3 ? 'average' : 'poor'}">${vote.voto_prestazione}/5</strong></span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            await customAlert(statsHtml);
+            
+        } catch (error) {
+            console.error('Errore caricamento statistiche giocatore:', error);
+            await customAlert('Errore nel caricamento delle statistiche');
+        }
+    },
+    
+    async loadAllPlayerStats() {
+        const container = document.getElementById('playerStatsView');
         container.innerHTML = '<div class="text-center p-4"><div class="spinner-border"></div><p>Caricamento statistiche...</p></div>';
         
         try {
