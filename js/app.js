@@ -408,7 +408,15 @@ function shareMatchLink(url) {
 function customAlert(message) {
     return new Promise((resolve) => {
         const modal = new bootstrap.Modal(document.getElementById('customAlertModal'));
-        document.getElementById('customAlertMessage').textContent = message;
+        const messageEl = document.getElementById('customAlertMessage');
+        
+        // Se il messaggio contiene HTML, usa innerHTML, altrimenti textContent
+        if (message.includes('<')) {
+            messageEl.innerHTML = message;
+        } else {
+            messageEl.textContent = message;
+        }
+        
         modal.show();
         
         const okBtn = document.querySelector('#customAlertModal .btn-primary');

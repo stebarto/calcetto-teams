@@ -17,6 +17,33 @@ const adminUI = {
         document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
         document.getElementById('addPlayerBtn').addEventListener('click', () => this.showAddPlayer());
         document.getElementById('savePlayerBtn').addEventListener('click', () => this.savePlayer());
+        
+        // Tab navigation
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => this.switchTab(e.target.closest('.admin-tab').dataset.tab));
+        });
+    },
+    
+    switchTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.tab === tabName);
+        });
+        
+        // Update tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        if (tabName === 'players') {
+            document.getElementById('playersTab').classList.add('active');
+        } else if (tabName === 'stats') {
+            document.getElementById('statsTab').classList.add('active');
+            this.loadPlayerStats();
+        } else if (tabName === 'history') {
+            document.getElementById('historyTab').classList.add('active');
+            this.loadMatchHistory();
+        }
     },
 
     async checkAuth() {
@@ -176,6 +203,322 @@ const adminUI = {
         } catch (error) {
             await customAlert('Errore nella cancellazione del giocatore');
             console.error(error);
+        }
+    },
+    
+    async loadPlayerStats() {
+        const container = document.getElementById('playerStats');
+        container.innerHTML = '<div class="text-center p-4"><div class="spinner-border"></div><p>Caricamento statistiche...</p></div>';
+        
+        try {
+            // Carica tutti i voti con i dati dei giocatori
+            const response = await fetch(
+                `${supabase.url}/rest/v1/match_votes?select=*,giocatori(id,nome,forma,avatar)`,
+                { headers: supabase.headers }
+            );
+            
+            const votes = await response.json();
+            
+            if (!votes || votes.length === 0) {
+                container.innerHTML = `
+                    <div class="no-stats">
+                        <i class="bi bi-graph-up"></i>
+                        <p>Nessuna statistica disponibile.<br>Le statistiche appariranno dopo le prime votazioni.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Raggruppa voti per giocatore
+            const playerStats = {};
+            votes.forEach(vote => {
+                const playerId = vote.player_id;
+                if (!playerStats[playerId]) {
+                    playerStats[playerId] = {
+                        player: vote.giocatori,
+                        votes: [],
+                        formaSum: 0,
+                        prestazioneSum: 0,
+                        count: 0
+                    };
+                }
+                playerStats[playerId].votes.push(vote);
+                playerStats[playerId].formaSum += vote.voto_forma;
+                playerStats[playerId].prestazioneSum += vote.voto_prestazione;
+                playerStats[playerId].count++;
+            });
+            
+            // Render statistiche
+            container.innerHTML = '';
+            Object.values(playerStats).forEach(stat => {
+                const avgForma = (stat.formaSum / stat.count).toFixed(1);
+                const avgPrestazione = (stat.prestazioneSum / stat.count).toFixed(1);
+                const currentForma = stat.player.forma;
+                
+                // Suggerisci nuovo valore forma basato sulla media
+                const suggestedForma = Math.round((currentForma + parseFloat(avgForma) * 3) / 2);
+                const clampedForma = Math.max(1, Math.min(10, suggestedForma));
+                
+                const formaClass = avgForma >= 2.5 ? 'good' : avgForma >= 2 ? 'average' : 'poor';
+                const prestazioneClass = avgPrestazione >= 4 ? 'good' : avgPrestazione >= 3 ? 'average' : 'poor';
+                
+                const card = document.createElement('div');
+                card.className = 'stat-card';
+                card.innerHTML = `
+                    <div class="stat-card-header">
+                        <div class="stat-player-name">${stat.player.nome}</div>
+                        <div class="stat-matches">${stat.count} partite</div>
+                    </div>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Media Forma</div>
+                            <div class="stat-value ${formaClass}">${avgForma}/3</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Media Prestazione</div>
+                            <div class="stat-value ${prestazioneClass}">${avgPrestazione}/5</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Forma Attuale</div>
+                            <div class="stat-value">${currentForma}/10</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Forma Suggerita</div>
+                            <div class="stat-value ${clampedForma > currentForma ? 'good' : clampedForma < currentForma ? 'poor' : ''}">${clampedForma}/10</div>
+                        </div>
+                    </div>
+                    <div class="stat-actions">
+                        <button class="btn-apply-stats" data-player-id="${stat.player.id}" data-new-forma="${clampedForma}" ${clampedForma === currentForma ? 'disabled' : ''}>
+                            <i class="bi bi-check-circle"></i> Applica Forma Suggerita (${clampedForma})
+                        </button>
+                    </div>
+                `;
+                
+                const applyBtn = card.querySelector('.btn-apply-stats');
+                if (!applyBtn.disabled) {
+                    applyBtn.addEventListener('click', () => this.applyStatsSuggestion(stat.player.id, clampedForma));
+                }
+                
+                container.appendChild(card);
+            });
+            
+        } catch (error) {
+            console.error('Errore caricamento statistiche:', error);
+            container.innerHTML = `
+                <div class="alert alert-danger m-3">
+                    Errore nel caricamento delle statistiche
+                </div>
+            `;
+        }
+    },
+    
+    async applyStatsSuggestion(playerId, newForma) {
+        const confirmed = await customConfirm(`Aggiornare il valore Forma a ${newForma}?`);
+        if (!confirmed) return;
+        
+        try {
+            // Carica il giocatore corrente
+            const response = await fetch(
+                `${supabase.url}/rest/v1/giocatori?id=eq.${playerId}`,
+                { headers: supabase.headers }
+            );
+            const players = await response.json();
+            const player = players[0];
+            
+            // Aggiorna solo la forma
+            const playerData = {
+                nome: player.nome,
+                ruolo: player.ruolo,
+                avatar: player.avatar,
+                forma: newForma,
+                difesa: player.difesa,
+                passaggi: player.passaggi,
+                attacco: player.attacco,
+                dribbling: player.dribbling
+            };
+            
+            await supabase.updatePlayer(playerId, playerData);
+            await customAlert('Forma aggiornata con successo!');
+            await this.loadPlayerStats();
+            
+        } catch (error) {
+            console.error('Errore aggiornamento:', error);
+            await customAlert('Errore nell\'aggiornamento del giocatore');
+        }
+    },
+    
+    async loadMatchHistory() {
+        const container = document.getElementById('matchHistory');
+        container.innerHTML = '<div class="text-center p-4"><div class="spinner-border"></div><p>Caricamento storico...</p></div>';
+        
+        try {
+            // Carica tutte le partite ordinate per data
+            const matchesResponse = await fetch(
+                `${supabase.url}/rest/v1/matches?select=*&order=data_partita.desc`,
+                { headers: supabase.headers }
+            );
+            
+            const matches = await matchesResponse.json();
+            
+            if (!matches || matches.length === 0) {
+                container.innerHTML = `
+                    <div class="no-stats">
+                        <i class="bi bi-clock-history"></i>
+                        <p>Nessuna partita nello storico.<br>Le partite appariranno dopo la prima conferma.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            for (const match of matches) {
+                // Conta i voti per questa partita
+                const votesResponse = await fetch(
+                    `${supabase.url}/rest/v1/match_votes?match_id=eq.${match.id}&select=id`,
+                    { headers: supabase.headers }
+                );
+                const votes = await votesResponse.json();
+                const voteCount = votes.length;
+                
+                const date = new Date(match.data_partita);
+                const dateStr = date.toLocaleDateString('it-IT', { 
+                    day: '2-digit', 
+                    month: '2-digit', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const balanceClass = match.balance_percentage >= 90 ? 'excellent' : 
+                                    match.balance_percentage >= 80 ? 'good' : 'poor';
+                
+                const card = document.createElement('div');
+                card.className = 'match-card';
+                card.innerHTML = `
+                    <div class="match-card-header">
+                        <div class="match-date">${dateStr}</div>
+                        <div class="match-balance ${balanceClass}">${match.balance_percentage}%</div>
+                    </div>
+                    <div class="match-teams-preview">
+                        <div class="match-team-preview team-a">
+                            <div class="match-team-name">Squadra A</div>
+                            <div class="match-team-score">${match.team_a_score}</div>
+                        </div>
+                        <div class="match-team-preview team-b">
+                            <div class="match-team-name">Squadra B</div>
+                            <div class="match-team-score">${match.team_b_score}</div>
+                        </div>
+                    </div>
+                    <div class="match-votes-count">
+                        <i class="bi bi-star-fill"></i> ${voteCount} voti ricevuti
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => this.showMatchDetail(match.id));
+                container.appendChild(card);
+            }
+            
+        } catch (error) {
+            console.error('Errore caricamento storico:', error);
+            container.innerHTML = `
+                <div class="alert alert-danger m-3">
+                    Errore nel caricamento dello storico
+                </div>
+            `;
+        }
+    },
+    
+    async showMatchDetail(matchId) {
+        try {
+            // Carica giocatori e voti della partita
+            const playersResponse = await fetch(
+                `${supabase.url}/rest/v1/match_players?match_id=eq.${matchId}&select=*,giocatori(nome,ruolo,avatar)`,
+                { headers: supabase.headers }
+            );
+            const players = await playersResponse.json();
+            
+            const votesResponse = await fetch(
+                `${supabase.url}/rest/v1/match_votes?match_id=eq.${matchId}&select=*`,
+                { headers: supabase.headers }
+            );
+            const votes = await votesResponse.json();
+            
+            // Raggruppa voti per giocatore
+            const playerVotes = {};
+            votes.forEach(vote => {
+                if (!playerVotes[vote.player_id]) {
+                    playerVotes[vote.player_id] = {
+                        formaSum: 0,
+                        prestazioneSum: 0,
+                        count: 0
+                    };
+                }
+                playerVotes[vote.player_id].formaSum += vote.voto_forma;
+                playerVotes[vote.player_id].prestazioneSum += vote.voto_prestazione;
+                playerVotes[vote.player_id].count++;
+            });
+            
+            // Separa squadre
+            const teamA = players.filter(p => p.team === 'A');
+            const teamB = players.filter(p => p.team === 'B');
+            
+            // Crea HTML per il dettaglio
+            const renderTeam = (team, teamName, teamClass) => {
+                return `
+                    <div class="match-detail-team ${teamClass}">
+                        <div class="match-detail-team-header">${teamName}</div>
+                        ${team.map(p => {
+                            const pVotes = playerVotes[p.player_id];
+                            const avgForma = pVotes ? (pVotes.formaSum / pVotes.count).toFixed(1) : '-';
+                            const avgPrestazione = pVotes ? (pVotes.prestazioneSum / pVotes.count).toFixed(1) : '-';
+                            const voteCount = pVotes ? pVotes.count : 0;
+                            
+                            const formaClass = avgForma >= 2.5 ? 'good' : avgForma >= 2 ? 'average' : 'poor';
+                            const prestazioneClass = avgPrestazione >= 4 ? 'good' : avgPrestazione >= 3 ? 'average' : 'poor';
+                            
+                            return `
+                                <div class="match-player-vote">
+                                    <div class="match-player-info">
+                                        <div class="match-player-name">${p.giocatori.nome}</div>
+                                        <div class="match-player-role">${p.giocatori.ruolo}</div>
+                                    </div>
+                                    <div class="match-player-votes">
+                                        <div class="vote-badge">
+                                            <div class="vote-badge-label">Forma</div>
+                                            <div class="vote-badge-value ${formaClass}">${avgForma}</div>
+                                        </div>
+                                        <div class="vote-badge">
+                                            <div class="vote-badge-label">Prestaz.</div>
+                                            <div class="vote-badge-value ${prestazioneClass}">${avgPrestazione}</div>
+                                        </div>
+                                        <div class="vote-badge">
+                                            <div class="vote-badge-label">Voti</div>
+                                            <div class="vote-badge-value">${voteCount}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            };
+            
+            const modalContent = `
+                <div class="match-detail">
+                    <div class="match-detail-teams">
+                        ${renderTeam(teamA, 'Squadra A', 'team-a')}
+                        ${renderTeam(teamB, 'Squadra B', 'team-b')}
+                    </div>
+                </div>
+            `;
+            
+            // Mostra in un modal custom
+            await customAlert(modalContent);
+            
+        } catch (error) {
+            console.error('Errore caricamento dettaglio:', error);
+            await customAlert('Errore nel caricamento del dettaglio partita');
         }
     }
 };

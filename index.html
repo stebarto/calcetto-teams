@@ -45,15 +45,50 @@
             <h1>Gestione Giocatori</h1>
             <button id="logoutBtn" class="btn btn-sm btn-secondary">Logout</button>
         </header>
-        <div class="container-fluid">
-            <div id="managePlayers" class="list-group">
-                <!-- Giocatori con opzioni edit/delete -->
+        
+        <!-- Tab Navigation -->
+        <div class="admin-tabs">
+            <button class="admin-tab active" data-tab="players">
+                <i class="bi bi-people-fill"></i> Giocatori
+            </button>
+            <button class="admin-tab" data-tab="stats">
+                <i class="bi bi-graph-up"></i> Statistiche
+            </button>
+            <button class="admin-tab" data-tab="history">
+                <i class="bi bi-clock-history"></i> Storico
+            </button>
+        </div>
+        
+        <!-- Tab Content: Giocatori -->
+        <div id="playersTab" class="tab-content active">
+            <div class="container-fluid">
+                <div id="managePlayers" class="list-group">
+                    <!-- Giocatori con opzioni edit/delete -->
+                </div>
+            </div>
+            <div class="sticky-bottom">
+                <button id="addPlayerBtn" class="btn btn-primary btn-generate">
+                    <i class="bi bi-plus-lg"></i> Aggiungi Giocatore
+                </button>
             </div>
         </div>
-        <div class="sticky-bottom">
-            <button id="addPlayerBtn" class="btn btn-primary btn-generate">
-                <i class="bi bi-plus-lg"></i> Aggiungi Giocatore
-            </button>
+        
+        <!-- Tab Content: Statistiche -->
+        <div id="statsTab" class="tab-content">
+            <div class="container-fluid">
+                <div id="playerStats" class="stats-container">
+                    <!-- Statistiche caricate dinamicamente -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Content: Storico -->
+        <div id="historyTab" class="tab-content">
+            <div class="container-fluid">
+                <div id="matchHistory" class="history-container">
+                    <!-- Storico partite caricato dinamicamente -->
+                </div>
+            </div>
         </div>
     </div>
 
