@@ -555,9 +555,8 @@ body {
 }
 
 /* Nascondi admin button quando non nella schermata principale */
-#resultScreen.active .admin-button,
-#loginScreen.active .admin-button,
-#manageScreen.active .admin-button {
+#resultScreen.active .admin-button:not(#adminMenuBtn):not(#logoutBtn),
+#loginScreen.active .admin-button:not(#adminMenuBtn):not(#logoutBtn) {
     display: none;
 }
 

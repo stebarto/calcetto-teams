@@ -157,9 +157,14 @@ const adminUI = {
 
     showAddPlayer() {
         this.currentPlayer = null;
+        this.currentSuggestions = null;
         document.getElementById('modalTitle').textContent = 'Aggiungi Giocatore';
         document.getElementById('playerForm').reset();
         document.getElementById('playerId').value = '';
+        
+        // Nascondi suggerimenti per nuovo giocatore
+        document.getElementById('playerSuggestions').style.display = 'none';
+        
         this.modal.show();
     },
 
