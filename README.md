@@ -2,6 +2,12 @@
 
 A Progressive Web App for generating balanced 5v5 soccer teams with player avatars, post-match voting system, and a retro 90s arcade aesthetic.
 
+## 🎥 Demo Video
+
+[![KickSplit Demo](https://img.youtube.com/vi/RXA1Y0zNhxo/maxresdefault.jpg)](https://www.youtube.com/watch?v=RXA1Y0zNhxo)
+
+**[Watch the full demo on YouTube →](https://www.youtube.com/watch?v=RXA1Y0zNhxo)**
+
 ## ✨ Features
 
 - **90s Arcade Style**: Retro soccer game aesthetic inspired by Super Sidekicks 3
