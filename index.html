@@ -42,25 +42,38 @@
     <!-- Schermata Gestione Giocatori -->
     <div id="manageScreen" class="screen">
         <header class="app-header">
-            <h1>Gestione Giocatori</h1>
-            <button id="logoutBtn" class="btn btn-sm btn-secondary">Logout</button>
+            <div class="header-content">
+                <button id="adminMenuBtn" class="admin-button" title="Menu">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h1>Admin Panel</h1>
+                <button id="logoutBtn" class="btn btn-sm btn-secondary">Logout</button>
+            </div>
         </header>
         
-        <!-- Tab Navigation -->
-        <div class="admin-tabs">
-            <button class="admin-tab active" data-tab="players">
-                <i class="bi bi-people-fill"></i> Giocatori
-            </button>
-            <button class="admin-tab" data-tab="stats">
-                <i class="bi bi-graph-up"></i> Statistiche
-            </button>
-            <button class="admin-tab" data-tab="history">
-                <i class="bi bi-clock-history"></i> Storico
-            </button>
+        <!-- Menu Hamburger -->
+        <div id="adminMenu" class="admin-menu">
+            <div class="admin-menu-content">
+                <button class="admin-menu-item active" data-section="players">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Giocatori</span>
+                </button>
+                <button class="admin-menu-item" data-section="stats">
+                    <i class="bi bi-graph-up"></i>
+                    <span>Statistiche</span>
+                </button>
+                <button class="admin-menu-item" data-section="history">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Storico</span>
+                </button>
+            </div>
         </div>
         
-        <!-- Tab Content: Giocatori -->
-        <div id="playersTab" class="tab-content active">
+        <!-- Overlay per chiudere menu -->
+        <div id="adminMenuOverlay" class="admin-menu-overlay"></div>
+        
+        <!-- Sezione: Giocatori -->
+        <div id="playersSection" class="admin-section active">
             <div class="container-fluid">
                 <div id="managePlayers" class="list-group">
                     <!-- Giocatori con opzioni edit/delete -->
@@ -73,17 +86,17 @@
             </div>
         </div>
         
-        <!-- Tab Content: Statistiche -->
-        <div id="statsTab" class="tab-content">
+        <!-- Sezione: Statistiche -->
+        <div id="statsSection" class="admin-section">
             <div class="container-fluid">
-                <div id="playerStats" class="stats-container">
+                <div id="playerStatsView" class="stats-container">
                     <!-- Statistiche caricate dinamicamente -->
                 </div>
             </div>
         </div>
         
-        <!-- Tab Content: Storico -->
-        <div id="historyTab" class="tab-content">
+        <!-- Sezione: Storico -->
+        <div id="historySection" class="admin-section">
             <div class="container-fluid">
                 <div id="matchHistory" class="history-container">
                     <!-- Storico partite caricato dinamicamente -->
@@ -178,6 +191,18 @@
                 <div class="modal-body">
                     <form id="playerForm">
                         <input type="hidden" id="playerId">
+                        
+                        <!-- Suggerimenti basati su voti -->
+                        <div id="playerSuggestions" class="alert alert-info" style="display: none;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong><i class="bi bi-lightbulb"></i> Suggerimenti dai voti</strong>
+                                <button type="button" class="btn btn-sm btn-primary" id="applySuggestionsBtn">
+                                    <i class="bi bi-check-circle"></i> Applica
+                                </button>
+                            </div>
+                            <div id="suggestionsContent"></div>
+                        </div>
+                        
                         <div class="mb-3">
                             <label class="form-label">Nome Completo</label>
                             <input type="text" class="form-control" id="playerName" required>

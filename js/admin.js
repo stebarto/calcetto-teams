@@ -18,30 +18,51 @@ const adminUI = {
         document.getElementById('addPlayerBtn').addEventListener('click', () => this.showAddPlayer());
         document.getElementById('savePlayerBtn').addEventListener('click', () => this.savePlayer());
         
-        // Tab navigation
-        document.querySelectorAll('.admin-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => this.switchTab(e.target.closest('.admin-tab').dataset.tab));
+        // Menu hamburger
+        document.getElementById('adminMenuBtn').addEventListener('click', () => this.toggleMenu());
+        document.getElementById('adminMenuOverlay').addEventListener('click', () => this.closeMenu());
+        
+        // Menu items
+        document.querySelectorAll('.admin-menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const section = e.target.closest('.admin-menu-item').dataset.section;
+                this.switchSection(section);
+                this.closeMenu();
+            });
         });
+        
+        // Apply suggestions button
+        document.getElementById('applySuggestionsBtn').addEventListener('click', () => this.applySuggestions());
     },
     
-    switchTab(tabName) {
-        // Update tab buttons
-        document.querySelectorAll('.admin-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.tab === tabName);
+    toggleMenu() {
+        document.getElementById('adminMenu').classList.toggle('open');
+        document.getElementById('adminMenuOverlay').classList.toggle('open');
+    },
+    
+    closeMenu() {
+        document.getElementById('adminMenu').classList.remove('open');
+        document.getElementById('adminMenuOverlay').classList.remove('open');
+    },
+    
+    switchSection(sectionName) {
+        // Update menu items
+        document.querySelectorAll('.admin-menu-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.section === sectionName);
         });
         
-        // Update tab content
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
+        // Update sections
+        document.querySelectorAll('.admin-section').forEach(section => {
+            section.classList.remove('active');
         });
         
-        if (tabName === 'players') {
-            document.getElementById('playersTab').classList.add('active');
-        } else if (tabName === 'stats') {
-            document.getElementById('statsTab').classList.add('active');
-            this.loadPlayerStats();
-        } else if (tabName === 'history') {
-            document.getElementById('historyTab').classList.add('active');
+        if (sectionName === 'players') {
+            document.getElementById('playersSection').classList.add('active');
+        } else if (sectionName === 'stats') {
+            document.getElementById('statsSection').classList.add('active');
+            this.loadAllPlayerStats();
+        } else if (sectionName === 'history') {
+            document.getElementById('historySection').classList.add('active');
             this.loadMatchHistory();
         }
     },
@@ -114,6 +135,9 @@ const adminUI = {
                     <div class="player-role">${player.ruolo} - Overall: ${overall}</div>
                 </div>
                 <div class="manage-player-actions">
+                    <button class="btn btn-stats" data-id="${player.id}" title="Statistiche">
+                        <i class="bi bi-graph-up"></i>
+                    </button>
                     <button class="btn btn-edit" data-id="${player.id}">
                         <i class="bi bi-pencil-fill"></i>
                     </button>
@@ -123,6 +147,7 @@ const adminUI = {
                 </div>
             `;
 
+            item.querySelector('.btn-stats').addEventListener('click', () => this.showPlayerStats(player));
             item.querySelector('.btn-edit').addEventListener('click', () => this.editPlayer(player));
             item.querySelector('.btn-delete').addEventListener('click', () => this.deletePlayer(player.id));
 
