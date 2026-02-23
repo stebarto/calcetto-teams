@@ -191,15 +191,22 @@ const adminUI = {
         const suggestionsContent = document.getElementById('suggestionsContent');
         
         try {
-            // Carica ultimi 5-10 voti del giocatore
+            // Carica ultimi 5-10 voti del giocatore con data partita
             const response = await fetch(
-                `${supabase.url}/rest/v1/match_votes?player_id=eq.${player.id}&select=*&order=created_at.desc&limit=10`,
+                `${supabase.url}/rest/v1/match_votes?player_id=eq.${player.id}&select=*,matches(data_partita)&order=match_id.desc&limit=10`,
                 { headers: supabase.headers }
             );
             
+            if (!response.ok) {
+                console.error('Supabase error:', response.status);
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+            
             const votes = await response.json();
             
-            if (!votes || votes.length === 0) {
+            // Verifica che votes sia un array
+            if (!Array.isArray(votes) || votes.length === 0) {
                 suggestionsBox.style.display = 'none';
                 return;
             }
