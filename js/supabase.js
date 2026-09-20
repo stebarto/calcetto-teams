@@ -1,6 +1,12 @@
 // Configurazione Supabase
 const SUPABASE_URL = 'https://kiksqvcqqzmawjhpgkzs.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtpa3NxdmNxcXptYXdqaHBna3pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzMDE2NjksImV4cCI6MjA4Njg3NzY2OX0.TY9pthRK4c89yIpxFu2VwLOyd243Wk2ukSbNUgEC1-w';
+const PRODUCTION_URL = 'https://stebarto.github.io/calcetto-teams/';
+// Deve restare allineata alla funzione public.is_admin() su Supabase:
+// qui decide solo cosa mostrare, le policy RLS decidono cosa si può salvare.
+const ADMIN_EMAILS = ['stebarto@gmail.com', 'scheke07@gmail.com'];
+// Rinnova la sessione poco prima della scadenza reale, per non farsi cogliere a metà richiesta
+const EXPIRY_SKEW_SECONDS = 60;
 
 class SupabaseClient {
     constructor() {
@@ -15,55 +21,192 @@ class SupabaseClient {
     }
 
     // Auth methods
-    async signInWithOtp(email) {
-        // Determina l'URL di redirect in base all'ambiente
-        let redirectTo;
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            // In locale usa l'URL completo corrente
-            redirectTo = window.location.origin + window.location.pathname;
-        } else {
-            // In produzione usa l'URL fisso di GitHub Pages
-            redirectTo = 'https://stebarto.github.io/calcetto-teams/';
+    // Decodifica il payload di un JWT senza verificarne la firma.
+    // La firma la verifica Supabase lato server: qui serve solo a leggere le claim per la UI.
+    decodeJwt(token) {
+        if (!token || typeof token !== 'string') return null;
+
+        const parts = token.split('.');
+        if (parts.length !== 3) return null;
+
+        try {
+            const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+            const json = decodeURIComponent(
+                atob(base64)
+                    .split('')
+                    .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                    .join('')
+            );
+            return JSON.parse(json);
+        } catch (error) {
+            return null;
         }
-        
-        const response = await fetch(`${this.url}/auth/v1/otp`, {
-            method: 'POST',
-            headers: this.headers,
-            body: JSON.stringify({
-                email,
-                options: {
-                    emailRedirectTo: redirectTo
-                }
-            })
-        });
-        return response.json();
+    }
+
+    getUserEmail() {
+        if (!this.session) return null;
+
+        const payload = this.decodeJwt(this.session.access_token);
+        if (!payload || !payload.email) return null;
+
+        return payload.email.toLowerCase();
+    }
+
+    parseSessionFromHash(hash) {
+        if (!hash) return null;
+
+        const params = new URLSearchParams(hash.replace(/^#/, ''));
+        const accessToken = params.get('access_token');
+        if (!accessToken) return null;
+
+        const expiresIn = parseInt(params.get('expires_in'), 10);
+        return {
+            access_token: accessToken,
+            refresh_token: params.get('refresh_token'),
+            expires_at: Math.floor(Date.now() / 1000) + (Number.isFinite(expiresIn) ? expiresIn : 0)
+        };
+    }
+
+    // Google rimanda indietro gli errori nell'hash, esattamente come i token
+    parseOAuthError(hash) {
+        if (!hash) return null;
+
+        const params = new URLSearchParams(hash.replace(/^#/, ''));
+        const error = params.get('error');
+        if (!error) return null;
+
+        return {
+            error,
+            description: params.get('error_description') || ''
+        };
+    }
+
+    isAdmin() {
+        const email = this.getUserEmail();
+        return email !== null && ADMIN_EMAILS.includes(email);
+    }
+
+    isSessionExpired() {
+        if (!this.session || !this.session.expires_at) return true;
+
+        const now = Math.floor(Date.now() / 1000);
+        return now >= this.session.expires_at - EXPIRY_SKEW_SECONDS;
+    }
+
+    getRedirectUrl() {
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        return isLocal
+            ? window.location.origin + window.location.pathname
+            : PRODUCTION_URL;
+    }
+
+    buildGoogleAuthUrl(redirectTo) {
+        return `${this.url}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`;
+    }
+
+    signInWithGoogle() {
+        window.location.href = this.buildGoogleAuthUrl(this.getRedirectUrl());
+    }
+
+    setSession(session) {
+        this.session = session;
+        localStorage.setItem('supabase_session', JSON.stringify(session));
+    }
+
+    clearSession() {
+        this.session = null;
+        localStorage.removeItem('supabase_session');
     }
 
     async getSession() {
-        const hash = window.location.hash;
-        if (hash && hash.includes('access_token')) {
-            const params = new URLSearchParams(hash.substring(1));
-            const accessToken = params.get('access_token');
-            const refreshToken = params.get('refresh_token');
-            
-            if (accessToken) {
-                this.session = { access_token: accessToken, refresh_token: refreshToken };
-                localStorage.setItem('supabase_session', JSON.stringify(this.session));
-                window.location.hash = '';
-                return this.session;
+        // Ritorno da Google: i token arrivano nell'hash dell'URL
+        const fromHash = this.parseSessionFromHash(window.location.hash);
+        if (fromHash) {
+            this.setSession(fromHash);
+            window.location.hash = '';
+            return this.session;
+        }
+
+        if (!this.session) {
+            const stored = localStorage.getItem('supabase_session');
+            if (stored) {
+                try {
+                    this.session = JSON.parse(stored);
+                } catch (error) {
+                    this.clearSession();
+                }
             }
         }
-        
-        const stored = localStorage.getItem('supabase_session');
-        if (stored) {
-            this.session = JSON.parse(stored);
+
+        if (!this.session) return null;
+
+        if (this.isSessionExpired()) {
+            if (this.session.refresh_token) {
+                return await this.refreshSession();
+            }
+            this.clearSession();
+            return null;
         }
+
         return this.session;
     }
 
+    async refreshSession() {
+        if (!this.session || !this.session.refresh_token) {
+            this.clearSession();
+            return null;
+        }
+
+        try {
+            const response = await fetch(`${this.url}/auth/v1/token?grant_type=refresh_token`, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify({ refresh_token: this.session.refresh_token })
+            });
+
+            if (!response.ok) {
+                this.clearSession();
+                return null;
+            }
+
+            const data = await response.json();
+            if (!data.access_token) {
+                this.clearSession();
+                return null;
+            }
+
+            this.setSession({
+                access_token: data.access_token,
+                refresh_token: data.refresh_token || this.session.refresh_token,
+                expires_at: Math.floor(Date.now() / 1000) + (data.expires_in || 0)
+            });
+            return this.session;
+
+        } catch (error) {
+            console.error('❌ Refresh sessione fallito:', error.message);
+            this.clearSession();
+            return null;
+        }
+    }
+
     async signOut() {
-        this.session = null;
-        localStorage.removeItem('supabase_session');
+        const token = this.session && this.session.access_token;
+
+        // La sessione locale va via comunque, anche se la chiamata al server fallisce
+        this.clearSession();
+        if (!token) return;
+
+        try {
+            await fetch(`${this.url}/auth/v1/logout`, {
+                method: 'POST',
+                headers: {
+                    ...this.headers,
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+        } catch (error) {
+            console.warn('⚠️ Logout lato server fallito, sessione locale comunque rimossa');
+        }
     }
 
     getAuthHeaders() {

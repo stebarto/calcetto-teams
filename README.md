@@ -46,7 +46,7 @@ Visit `http://localhost:8000`
 - **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3
 - **Styling**: Custom 90s arcade design system + Bootstrap 5
 - **Database**: Supabase (PostgreSQL with REST API)
-- **Auth**: Supabase Magic Link (email OTP)
+- **Auth**: Supabase Auth con Google OAuth
 - **PWA**: Service Worker (Network-First strategy) + Web App Manifest
 - **Hosting**: GitHub Pages
 
@@ -249,10 +249,14 @@ After confirming teams, a shareable link is generated for post-match voting:
 │   ├── AppImages/         # PWA icons (iOS/Android/Windows)
 │   ├── giocatori/         # Player avatars (4 PNG files)
 │   └── votazioni/         # Voting icons (3 PNG files)
-└── tests/
-    ├── test-runner.html   # Test suite runner
-    ├── supabase.test.js   # Database tests
-    └── generator.test.js  # Algorithm tests
+├── tests/
+│   ├── test-runner.html   # Test suite runner (browser)
+│   ├── run-node.js        # Test runner (terminal)
+│   ├── supabase.test.js   # Database tests
+│   ├── generator.test.js  # Algorithm tests
+│   └── auth.test.js       # Auth tests
+├── AUTH_SYSTEM.md          # Auth & admin docs
+└── VOTING_SYSTEM.md        # Voting system docs
 ```
 
 ## 🎨 Design System
@@ -275,21 +279,31 @@ After confirming teams, a shareable link is generated for post-match voting:
 ## 🔐 Admin Access
 
 1. Click the gear icon in the header
-2. Enter authorized email (configured in code)
-3. Check email for magic link
-4. Manage players:
+2. Click "Accedi con Google" and pick an authorized Google account
+3. Manage players:
    - Add/edit/delete players
    - Set player attributes (1-10 scale)
    - Choose avatar style
    - Assign role (DIF/CEN/ATT/JOLLY)
+
+### Adding an admin
+
+The authorized list lives in **two places that must stay in sync** — `ADMIN_EMAILS` in
+[js/supabase.js](js/supabase.js) and the `public.is_admin()` function on Supabase. Updating only
+one of them leaves the account half-authorized in a confusing way.
+
+Full procedure, setup and troubleshooting: **[AUTH_SYSTEM.md](AUTH_SYSTEM.md)**.
 
 ## 🧪 Testing
 
 Run the test suite locally:
 
 ```bash
-# Open in browser
+# Browser (tutti i test, inclusi quelli che richiedono il DOM)
 open tests/test-runner.html
+
+# Terminale (test di logica pura, niente browser)
+node tests/run-node.js
 ```
 
 Tests include:
@@ -297,6 +311,7 @@ Tests include:
 - Team generation algorithm
 - Balance calculation
 - Mock data fallback
+- Auth: URL OAuth, decodifica JWT, scadenza e rinnovo sessione, check admin
 
 ## 🚢 Deployment
 

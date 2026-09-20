@@ -1026,6 +1026,41 @@ body {
     font-weight: 900;
 }
 
+/* Bottone Google: testo non maiuscolo come da linee guida del brand */
+.google-login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: #FFFFFF;
+    border: 3px solid #333;
+    color: #3c4043;
+    text-transform: none;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+}
+
+.google-login-btn:hover,
+.google-login-btn:focus {
+    background: #F8F9FA;
+    color: #3c4043;
+    border-color: #333;
+}
+
+.google-login-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+}
+
+.google-login-btn:disabled {
+    opacity: 0.7;
+}
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
 /* Manage Screen */
 .manage-player-item {
     background: linear-gradient(180deg, #FFFFFF 0%, #E8E8E8 100%);

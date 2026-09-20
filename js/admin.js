@@ -11,8 +11,11 @@ const adminUI = {
     },
 
     setupEventListeners() {
-        document.getElementById('adminFab').addEventListener('click', () => this.showLogin());
-        document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
+        document.getElementById('adminFab').addEventListener('click', () => {
+            this.resetLoginScreen();
+            this.showLogin();
+        });
+        document.getElementById('googleLoginBtn').addEventListener('click', () => this.handleGoogleLogin());
         document.getElementById('backToAppBtn').addEventListener('click', () => this.backToApp());
         document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
         document.getElementById('addPlayerBtn').addEventListener('click', () => this.showAddPlayer());
@@ -68,10 +71,49 @@ const adminUI = {
     },
 
     async checkAuth() {
-        const session = await supabase.getSession();
-        if (session) {
-            this.showManageScreen();
+        // Consenso negato o errore lato Google: l'hash contiene l'errore, non i token
+        const oauthError = supabase.parseOAuthError(window.location.hash);
+        if (oauthError) {
+            window.location.hash = '';
+            this.resetLoginScreen();
+            this.showLogin();
+            this.showLoginMessage(
+                oauthError.error === 'access_denied'
+                    ? 'Accesso annullato. Riprova quando vuoi.'
+                    : `Login fallito: ${oauthError.description || oauthError.error}`,
+                'danger'
+            );
+            return;
         }
+
+        const session = await supabase.getSession();
+        if (!session) return;
+
+        // L'accesso vero lo decidono le policy RLS lato Supabase:
+        // qui evitiamo solo di mostrare una UI admin a chi non potrebbe salvare nulla.
+        if (!supabase.isAdmin()) {
+            const email = supabase.getUserEmail();
+            await supabase.signOut();
+            this.showLogin();
+            this.showLoginMessage(
+                `Account ${email || 'sconosciuto'} non autorizzato. Accedi con l'account admin.`,
+                'danger'
+            );
+            return;
+        }
+
+        this.showManageScreen();
+    },
+
+    showLoginMessage(text, type) {
+        const messageEl = document.getElementById('loginMessage');
+        messageEl.className = `alert alert-${type}`;
+        messageEl.textContent = text;
+        messageEl.style.display = 'block';
+    },
+
+    hideLoginMessage() {
+        document.getElementById('loginMessage').style.display = 'none';
     },
 
     showLogin() {
@@ -79,34 +121,25 @@ const adminUI = {
         document.getElementById('loginScreen').classList.add('active');
     },
 
+    resetLoginScreen() {
+        const btn = document.getElementById('googleLoginBtn');
+        btn.disabled = false;
+        btn.querySelector('span').textContent = 'Accedi con Google';
+        this.hideLoginMessage();
+    },
+
     backToApp() {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('selectionScreen').classList.add('active');
     },
 
-    async handleLogin(e) {
-        e.preventDefault();
-        const email = document.getElementById('emailInput').value;
-        const messageEl = document.getElementById('loginMessage');
-        
-        // Verifica email autorizzata
-        if (email !== 'stebarto@gmail.com') {
-            messageEl.className = 'alert alert-danger';
-            messageEl.textContent = 'Email non autorizzata. Solo l\'admin può accedere.';
-            messageEl.style.display = 'block';
-            return;
-        }
-        
-        try {
-            await supabase.signInWithOtp(email);
-            messageEl.className = 'alert alert-success';
-            messageEl.textContent = 'Magic link inviato! Controlla la tua email.';
-            messageEl.style.display = 'block';
-        } catch (error) {
-            messageEl.className = 'alert alert-danger';
-            messageEl.textContent = 'Errore nell\'invio del link. Riprova.';
-            messageEl.style.display = 'block';
-        }
+    handleGoogleLogin() {
+        const btn = document.getElementById('googleLoginBtn');
+        btn.disabled = true;
+        btn.querySelector('span').textContent = 'Reindirizzamento...';
+
+        // Porta fuori dall'app: al ritorno ci pensa checkAuth()
+        supabase.signInWithGoogle();
     },
 
     async handleLogout() {

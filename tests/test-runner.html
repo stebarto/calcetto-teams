@@ -27,6 +27,7 @@
                         <button id="runAllTests" class="btn btn-primary me-2">🚀 Esegui Tutti i Test</button>
                         <button id="runSupabaseTests" class="btn btn-info me-2">🗄️ Test Supabase</button>
                         <button id="runGeneratorTests" class="btn btn-success me-2">⚽ Test Generator</button>
+                        <button id="runAuthTests" class="btn btn-warning me-2">🔐 Test Auth</button>
                         <button id="clearResults" class="btn btn-secondary">🗑️ Pulisci Risultati</button>
                     </div>
                 </div>
@@ -75,6 +76,7 @@
     <!-- Test Scripts -->
     <script src="supabase.test.js"></script>
     <script src="generator.test.js"></script>
+    <script src="auth.test.js"></script>
     
     <script>
         class TestRunner {
@@ -119,6 +121,7 @@
                 document.getElementById('runAllTests').addEventListener('click', () => this.runAllTests());
                 document.getElementById('runSupabaseTests').addEventListener('click', () => this.runSupabaseTests());
                 document.getElementById('runGeneratorTests').addEventListener('click', () => this.runGeneratorTests());
+                document.getElementById('runAuthTests').addEventListener('click', () => this.runAuthTests());
                 document.getElementById('clearResults').addEventListener('click', () => this.clearResults());
             }
 
@@ -128,6 +131,7 @@
                 
                 await this.runSupabaseTests();
                 await this.runGeneratorTests();
+                await this.runAuthTests();
                 
                 this.updateOverallStats();
                 console.log('✅ Suite di test completata!');
@@ -145,6 +149,14 @@
                 console.log('\n⚽ === TEST GENERATOR ===');
                 const generatorTests = new GeneratorTests();
                 const results = await generatorTests.runAllTests();
+                this.allResults.push(...results);
+                this.updateResults();
+            }
+
+            async runAuthTests() {
+                console.log('\n🔐 === TEST AUTH ===');
+                const authTests = new AuthTests();
+                const results = await authTests.runAllTests();
                 this.allResults.push(...results);
                 this.updateResults();
             }

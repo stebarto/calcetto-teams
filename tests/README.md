@@ -9,7 +9,9 @@ tests/
 ├── README.md              # Questa documentazione
 ├── test-runner.html       # Interface web per eseguire i test
 ├── supabase.test.js       # Test per connessione database
-└── generator.test.js      # Test per generazione squadre
+├── generator.test.js      # Test per generazione squadre
+├── auth.test.js           # Test per autenticazione Google OAuth
+└── run-node.js            # Runner da terminale (test di logica pura)
 ```
 
 ## 🚀 Come Eseguire i Test

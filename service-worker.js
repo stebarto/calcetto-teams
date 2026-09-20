@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kicksplit-v20260222-avatar';
+const CACHE_NAME = 'kicksplit-v20260920-google-auth';
 const urlsToCache = [
     './',
     './index.html',
